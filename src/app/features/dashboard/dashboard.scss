@@ -1,0 +1,48 @@
+@use '../../../styles/variables' as *;
+
+.hero {
+  padding: 28px 24px;
+  border-radius: $radius-large;
+  background: $gradient-brand;
+  box-shadow: $shadow-hover;
+  color: #ffffff;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero-text {
+  margin: 4px 0 20px;
+  opacity: 0.95;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+
+  dt {
+    font-size: 0.9rem;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+}

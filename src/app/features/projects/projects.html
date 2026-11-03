@@ -1,0 +1,42 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Projets</h1>
+    <p class="page-subtitle">Un projet réunit les tâches de plusieurs commissions autour d'un même objectif.</p>
+  </div>
+  @if (isAdmin()) {
+    <button type="button" class="btn btn-primary" (click)="startAdding()">+ Nouveau projet</button>
+  }
+</div>
+
+@if (cards().length) {
+  <ul class="card-grid">
+    @for (card of cards(); track card.project.id) {
+      <li class="card card-interactive" [class]="card.tone">
+        <h2 class="card-title">
+          <a class="card-link" [routerLink]="['/projets', card.project.id]">{{ card.project.name }}</a>
+        </h2>
+        @if (card.project.description) {
+          <p>{{ card.project.description }}</p>
+        }
+        <p class="meta-line">
+          @if (card.project.dueDate; as due) {
+            📅 Échéance : {{ due | date: 'dd/MM/yyyy' }}<br />
+          }
+          @if (card.involved) {
+            Commissions : {{ card.involved }}<br />
+          }
+          {{ card.open }} tâche(s) ouverte(s) dont {{ card.free }} à prendre
+        </p>
+        <app-progress [done]="card.done" [total]="card.total" [label]="'Avancement de ' + card.project.name" />
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="empty-state">Aucun projet pour le moment.</p>
+}
+
+@if (adding()) {
+  <app-modal title="Nouveau projet" (closed)="stopAdding()">
+    <app-project-form (done)="stopAdding()" />
+  </app-modal>
+}

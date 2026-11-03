@@ -1,0 +1,22 @@
+<form class="card form" [formGroup]="form" (ngSubmit)="submit()">
+  @if (project()) {
+    <h3 class="form-title">Modifier le projet</h3>
+  }
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-name'">Nom</label>
+    <input [id]="id + '-name'" autofocus class="field-control" type="text" formControlName="name" required />
+  </div>
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-description'">Description</label>
+    <textarea [id]="id + '-description'" class="field-control" rows="3" formControlName="description"></textarea>
+  </div>
+  <app-date-field [control]="form.controls.dueDate" label="Date de l'événement (facultatif)" />
+  <app-tone-picker [control]="form.controls.color" legend="Couleur du projet" />
+  @if (error(); as message) {
+    <p class="error-message" role="alert">{{ message }}</p>
+  }
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ project() ? 'Enregistrer' : 'Créer le projet' }}</button>
+    <button type="button" class="btn" (click)="done.emit()">Annuler</button>
+  </div>
+</form>

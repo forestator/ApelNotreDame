@@ -1,0 +1,87 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Calendrier</h1>
+    <p class="page-subtitle">Les échéances des tâches et des projets.</p>
+  </div>
+  <button type="button" class="btn btn-primary" (click)="startAdding()">+ Nouvelle tâche</button>
+</div>
+
+@if (overdue().length) {
+  <section class="card overdue" aria-labelledby="overdue-title">
+    <h2 id="overdue-title" class="overdue-title">⚠️ En retard ({{ overdue().length }})</h2>
+    <ul class="overdue-list">
+      @for (event of overdue(); track event.id) {
+        <li>
+          <span class="overdue-date">{{ event.dateLabel }}</span>
+          <a class="link" [routerLink]="event.link">{{ event.title }}</a>
+          <span class="muted">{{ event.subtitle }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+<div class="calendar-bar">
+  <button type="button" class="btn btn-small" (click)="previousMonth()">
+    <span aria-hidden="true">‹</span><span class="visually-hidden">Mois précédent</span>
+  </button>
+  <h2 class="calendar-month" aria-live="polite">{{ monthLabel() }}</h2>
+  <button type="button" class="btn btn-small" (click)="nextMonth()">
+    <span aria-hidden="true">›</span><span class="visually-hidden">Mois suivant</span>
+  </button>
+  <button type="button" class="btn btn-small calendar-today" (click)="goToToday()">Aujourd'hui</button>
+</div>
+
+<ol class="weekdays" aria-hidden="true">
+  @for (weekday of weekdays; track weekday) {
+    <li>{{ weekday }}</li>
+  }
+</ol>
+
+<ol class="days">
+  @for (cell of cells(); track cell.key) {
+    @if (cell.day) {
+      <li class="day" [class.day-today]="cell.isToday" [class.day-empty]="!cell.events.length">
+        <div class="day-head">
+          <span class="day-number" aria-hidden="true">{{ cell.day }}</span>
+          <span class="day-label">{{ cell.label }}</span>
+          <button type="button" class="day-add" (click)="startAdding(cell.key)">
+            <span aria-hidden="true">+</span><span class="visually-hidden">Ajouter une tâche le {{ cell.label }}</span>
+          </button>
+        </div>
+        @if (cell.events.length) {
+          <ul class="day-events">
+            @for (event of cell.events; track event.id) {
+              <li>
+                <a class="event" [class]="event.tone" [class.event-done]="event.done" [routerLink]="event.link">
+                  <span class="event-title">
+                    @if (event.kind === 'project') {
+                      <span aria-hidden="true">🎯</span>
+                    }
+                    {{ event.title }}
+                  </span>
+                  <span class="event-subtitle">{{ event.subtitle }}</span>
+                  @if (event.done) {
+                    <span class="visually-hidden">(terminée)</span>
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </li>
+    } @else {
+      <li class="day day-blank" aria-hidden="true"></li>
+    }
+  }
+</ol>
+
+@if (!monthEventCount()) {
+  <p class="empty-state calendar-empty">Aucune échéance ce mois-ci.</p>
+}
+
+@if (adding()) {
+  <app-modal title="Nouvelle tâche" (closed)="stopAdding()">
+    <app-task-form [commissions]="commissions()" [projects]="projects()" [initialDueDate]="addDate()" (done)="stopAdding()" />
+  </app-modal>
+}

@@ -1,0 +1,51 @@
+<h1 class="page-title">Mon profil</h1>
+<p class="page-subtitle">Ces informations sont visibles par les autres membres de l'APEL.</p>
+
+@if (member(); as current) {
+  <section class="card profile-card" aria-labelledby="photo-title">
+    <h2 id="photo-title" class="card-title">Photo de profil</h2>
+    <div class="profile-photo">
+      <span class="profile-avatar"><app-avatar [name]="current.displayName" [photoUrl]="current.photoURL" /></span>
+      <div class="profile-photo-actions">
+        <label class="btn btn-small profile-file">
+          Choisir une photo
+          <input #photoInput type="file" accept="image/*" class="visually-hidden" (change)="choosePhoto(photoInput.files)" />
+        </label>
+        @if (googlePhoto()) {
+          <button type="button" class="btn btn-small" (click)="useGooglePhoto()">Utiliser ma photo Google</button>
+        }
+        @if (current.photoURL) {
+          <button type="button" class="btn btn-danger btn-small" (click)="removePhoto()">Supprimer la photo</button>
+        }
+      </div>
+    </div>
+    <p class="field-hint">L'image est recadrée au carré et réduite automatiquement.</p>
+  </section>
+
+  <form class="card form profile-card" [formGroup]="form" (ngSubmit)="save()">
+    <h2 class="card-title">Informations</h2>
+    <div class="field">
+      <label class="field-label" for="profile-name">Nom affiché</label>
+      <input id="profile-name" class="field-control" type="text" formControlName="displayName" autocomplete="name" required />
+      <span class="field-hint">Ce nom apparaît sur les tâches, les aidants et la liste des membres.</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Adresse e-mail</span>
+      <span class="muted">{{ current.email }} (compte Google)</span>
+    </div>
+    <label class="profile-check">
+      <input type="checkbox" formControlName="emailNotifications" />
+      <span>Me prévenir par e-mail quand on m'affecte une tâche ou qu'on m'ajoute comme aidant</span>
+    </label>
+
+    @if (message(); as text) {
+      <p role="status" class="profile-success">{{ text }}</p>
+    }
+    @if (error(); as text) {
+      <p class="error-message" role="alert">{{ text }}</p>
+    }
+    <div>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enregistrer</button>
+    </div>
+  </form>
+}

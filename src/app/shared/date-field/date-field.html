@@ -1,0 +1,78 @@
+<div class="field">
+  <label class="field-label" [attr.for]="id">{{ label() }}</label>
+  <div class="date-input-row">
+    <input
+      #textInput
+      [id]="id"
+      class="field-control"
+      type="text"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="jj/mm/aaaa"
+      [attr.aria-describedby]="id + '-hint'"
+      [formControl]="control()"
+    />
+    <button
+      #toggleButton
+      type="button"
+      class="btn date-toggle"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="open()"
+      [attr.aria-controls]="id + '-picker'"
+      (click)="toggle()"
+    >
+      <span aria-hidden="true">📅</span><span class="visually-hidden">Choisir une date dans le calendrier</span>
+    </button>
+  </div>
+  <span [id]="id + '-hint'" class="field-hint" [class.field-hint-error]="invalid()">
+    {{ invalid() ? 'Date invalide : utilisez le format jj/mm/aaaa.' : 'Format jj/mm/aaaa' }}
+  </span>
+
+  @if (open()) {
+    <div class="date-picker" [id]="id + '-picker'" role="dialog" aria-label="Choisir une date" (keydown.escape)="close()">
+      <div class="date-picker-bar">
+        <button type="button" class="btn btn-small" (click)="shiftMonth(-1)">
+          <span aria-hidden="true">‹</span><span class="visually-hidden">Mois précédent</span>
+        </button>
+        <span class="date-picker-month" aria-live="polite">{{ monthLabel() }}</span>
+        <button type="button" class="btn btn-small" (click)="shiftMonth(1)">
+          <span aria-hidden="true">›</span><span class="visually-hidden">Mois suivant</span>
+        </button>
+      </div>
+
+      <div class="date-picker-weekdays" aria-hidden="true">
+        @for (weekday of weekdays; track weekday) {
+          <span>{{ weekday }}</span>
+        }
+      </div>
+
+      <div class="date-picker-grid" role="group" aria-label="Jours du mois" (keydown)="onGridKeydown($event)">
+        @for (cell of cells(); track cell.key) {
+          @if (cell.day) {
+            <button
+              type="button"
+              class="date-day"
+              [class.date-day-selected]="cell.selected"
+              [class.date-day-today]="cell.today"
+              [attr.data-iso]="cell.iso"
+              [attr.tabindex]="cell.focusable ? 0 : -1"
+              [attr.aria-label]="cell.label"
+              [attr.aria-pressed]="cell.selected"
+              (click)="pick(cell.iso)"
+            >
+              {{ cell.day }}
+            </button>
+          } @else {
+            <span aria-hidden="true"></span>
+          }
+        }
+      </div>
+
+      <div class="date-picker-footer">
+        <button type="button" class="btn btn-small" (click)="pickToday()">Aujourd'hui</button>
+        <button type="button" class="btn btn-small" (click)="clear()">Effacer</button>
+        <button type="button" class="btn btn-small" (click)="close()">Fermer</button>
+      </div>
+    </div>
+  }
+</div>

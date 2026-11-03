@@ -1,0 +1,17 @@
+<dialog
+  #dialog
+  class="modal"
+  [attr.aria-labelledby]="titleId"
+  (close)="closed.emit()"
+  (click)="closeOnBackdrop($event)"
+>
+  <div class="modal-panel">
+    <header class="modal-header">
+      <h2 [id]="titleId" class="modal-title">{{ title() }}</h2>
+      <button type="button" class="btn btn-small modal-close" (click)="closed.emit()">
+        <span aria-hidden="true">×</span><span class="visually-hidden">Fermer</span>
+      </button>
+    </header>
+    <ng-content />
+  </div>
+</dialog>

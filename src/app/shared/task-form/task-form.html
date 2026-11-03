@@ -1,0 +1,48 @@
+<form class="card form" [formGroup]="form" (ngSubmit)="submit()">
+  @if (task()) {
+    <h3 class="form-title">Modifier la tâche</h3>
+  }
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-title'">Titre</label>
+    <input [id]="id + '-title'" autofocus class="field-control" type="text" formControlName="title" required />
+  </div>
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-description'">Description</label>
+    <textarea [id]="id + '-description'" class="field-control" rows="3" formControlName="description"></textarea>
+  </div>
+  @if (showCommission()) {
+    <div class="field">
+      <label class="field-label" [attr.for]="id + '-commission'">Commission responsable</label>
+      <select [id]="id + '-commission'" class="field-control select-toned" [class]="commissionTone()" formControlName="commissionId" required>
+        <option value="">Choisir…</option>
+        @for (option of commissionOptions(); track option.id) {
+          <option [value]="option.id" class="select-option" [class]="option.tone">{{ option.name }}</option>
+        }
+      </select>
+    </div>
+  }
+  @if (showProject()) {
+    <div class="field">
+      <label class="field-label" [attr.for]="id + '-project'">Projet (facultatif)</label>
+      <select [id]="id + '-project'" class="field-control select-toned" [class]="projectTone()" formControlName="projectId">
+        <option value="">Aucun projet</option>
+        @for (option of projectOptions(); track option.id) {
+          <option [value]="option.id" class="select-option" [class]="option.tone">{{ option.name }}</option>
+        }
+      </select>
+    </div>
+  }
+  <app-date-field [control]="form.controls.dueDate" label="Échéance (facultatif)" />
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-helpers'">Aidants souhaités (facultatif)</label>
+    <input [id]="id + '-helpers'" class="field-control" type="number" min="0" max="50" formControlName="helpersNeeded" />
+    <span class="field-hint">Pour les tâches à plusieurs, comme le montage : en plus du responsable.</span>
+  </div>
+  @if (error(); as message) {
+    <p class="error-message" role="alert">{{ message }}</p>
+  }
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ task() ? 'Enregistrer' : 'Ajouter la tâche' }}</button>
+    <button type="button" class="btn" (click)="done.emit()">Annuler</button>
+  </div>
+</form>

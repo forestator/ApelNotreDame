@@ -1,0 +1,155 @@
+<h1 class="page-title">Membres</h1>
+
+<section aria-labelledby="pending-title">
+  <h2 id="pending-title" class="section-title">Demandes en attente</h2>
+  @if (pending().length) {
+    <ul class="card-list">
+      @for (member of pending(); track member.uid) {
+        <li class="card member-row">
+          <span class="member-identity">
+            <app-avatar [name]="member.displayName" [photoUrl]="member.photoURL" />
+            <span>
+              <strong>{{ member.displayName }}</strong><br />
+              <span class="muted">{{ member.email }}</span>
+            </span>
+          </span>
+          <span class="member-actions">
+            <button type="button" class="btn btn-primary btn-small" (click)="approve(member)">
+              Approuver<span class="visually-hidden"> {{ member.displayName }}</span>
+            </button>
+            @if (confirmingUid() === member.uid) {
+              <span role="alert">Confirmer ?</span>
+              <button type="button" class="btn btn-danger btn-small" (click)="reject(member)">
+                Oui<span class="visually-hidden">, refuser {{ member.displayName }}</span>
+              </button>
+              <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
+            } @else {
+              <button type="button" class="btn btn-danger btn-small" (click)="askRemoval(member)">
+                Refuser<span class="visually-hidden"> {{ member.displayName }}</span>
+              </button>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Aucune demande en attente.</p>
+  }
+</section>
+
+<section aria-labelledby="approved-title">
+  <h2 id="approved-title" class="section-title">Membres approuvés</h2>
+  <ul class="card-list">
+    @for (row of approved(); track row.member.uid) {
+      <li class="card member-row">
+        <span class="member-identity">
+          <app-avatar [name]="row.member.displayName" [photoUrl]="row.member.photoURL" />
+          <span>
+            <strong>{{ row.member.displayName }}</strong>
+            @if (row.member.role === 'admin') {
+              <span class="badge badge-in-progress">Admin</span>
+            }
+            <br />
+            <span class="muted">{{ row.member.email }}</span>
+          </span>
+        </span>
+        @if (!row.isSelf) {
+          <span class="member-actions">
+            <button type="button" class="btn btn-small" (click)="toggleAdmin(row.member)">
+              {{ row.member.role === 'admin' ? 'Retirer admin' : 'Nommer admin' }}<span class="visually-hidden">
+                {{ row.member.displayName }}</span>
+            </button>
+            @if (confirmingUid() === row.member.uid) {
+              <span role="alert">Confirmer ?</span>
+              <button type="button" class="btn btn-danger btn-small" (click)="reject(row.member)">
+                Oui<span class="visually-hidden">, retirer {{ row.member.displayName }}</span>
+              </button>
+              <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
+            } @else {
+              <button type="button" class="btn btn-danger btn-small" (click)="askRemoval(row.member)">
+                Retirer<span class="visually-hidden"> {{ row.member.displayName }}</span>
+              </button>
+            }
+          </span>
+        }
+      </li>
+    }
+  </ul>
+</section>
+
+<section aria-labelledby="placeholders-title">
+  <h2 id="placeholders-title" class="section-title">Personnes sans compte</h2>
+  <p class="page-subtitle">
+    Fiches provisoires pour pouvoir déjà affecter des tâches. Dès que la personne a créé son compte et que vous l'avez
+    approuvé, remplacez la fiche : ses tâches, son rôle d'aidant et ses commissions passent au vrai compte.
+  </p>
+
+  @if (error(); as message) {
+    <p class="error-message" role="alert">{{ message }}</p>
+  }
+
+  @if (placeholders().length) {
+    <ul class="card-list">
+      @for (placeholder of placeholders(); track placeholder.uid) {
+        <li class="card placeholder-row">
+          <span class="member-identity">
+            <app-avatar [name]="placeholder.displayName" [photoUrl]="null" />
+            <strong>{{ placeholder.displayName }}</strong>
+            <span class="badge badge-todo">Sans compte</span>
+          </span>
+
+          @if (placeholderAction(); as action) {
+            @if (action.uid === placeholder.uid) {
+              <span class="member-actions" role="alert">
+                @if (action.kind === 'replace') {
+                  <span>Transférer tout vers le vrai compte et supprimer cette fiche ?</span>
+                } @else {
+                  <span>Supprimer cette fiche et libérer ses tâches ?</span>
+                }
+                <button type="button" class="btn btn-danger btn-small" (click)="confirmPlaceholderAction(placeholder)">Confirmer</button>
+                <button type="button" class="btn btn-small" (click)="cancelPlaceholderAction()">Annuler</button>
+              </span>
+            }
+          }
+
+          @if (placeholderAction()?.uid !== placeholder.uid) {
+            <span class="member-actions">
+              <label class="placeholder-target">
+                <span class="visually-hidden">Vrai compte de {{ placeholder.displayName }}</span>
+                <select #target class="field-control placeholder-select" (change)="chooseTarget(placeholder.uid, target.value)">
+                  <option value="">Remplacer par…</option>
+                  @for (member of realMembers(); track member.uid) {
+                    <option [value]="member.uid">{{ member.displayName }}</option>
+                  }
+                </select>
+              </label>
+              <button
+                type="button"
+                class="btn btn-primary btn-small"
+                [disabled]="!targets()[placeholder.uid]"
+                (click)="askPlaceholderAction(placeholder.uid, 'replace')"
+              >
+                Remplacer<span class="visually-hidden"> {{ placeholder.displayName }}</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-small" (click)="askPlaceholderAction(placeholder.uid, 'release')">
+                Supprimer<span class="visually-hidden"> {{ placeholder.displayName }}</span>
+              </button>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Aucune fiche provisoire.</p>
+  }
+
+  <form class="card form placeholder-form" [formGroup]="placeholderForm" (ngSubmit)="addPlaceholder()">
+    <div class="field">
+      <label class="field-label" for="placeholder-name">Ajouter une personne sans compte</label>
+      <input id="placeholder-name" class="field-control" type="text" formControlName="name" placeholder="Prénom" />
+    </div>
+    <div>
+      <button type="submit" class="btn btn-small" [disabled]="placeholderForm.invalid">Ajouter</button>
+    </div>
+  </form>
+</section>

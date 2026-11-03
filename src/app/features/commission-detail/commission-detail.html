@@ -1,0 +1,70 @@
+<p><a class="link" routerLink="/commissions">← Toutes les commissions</a></p>
+
+@if (commission(); as current) {
+  @if (editing()) {
+    <app-commission-form [commission]="current" (done)="stopEditing()" />
+  } @else {
+    <h1 class="page-title commission-title" [class]="tone()">{{ current.name }}</h1>
+    @if (current.description) {
+      <p>{{ current.description }}</p>
+    }
+    <p class="meta-line">Responsable : {{ leadName() ?? 'à désigner' }}</p>
+    @if (canManage()) {
+      <button type="button" class="btn btn-small" (click)="startEditing()">Modifier la commission</button>
+    }
+  }
+
+  <div class="card detail-progress" [class]="tone()">
+    <app-progress [done]="doneCount()" [total]="totalCount()" [label]="'Avancement de ' + current.name" />
+  </div>
+
+  @if (isAdmin()) {
+    <div class="card form admin-box">
+      <div class="field">
+        <label class="field-label" for="lead-select">Responsable de la commission</label>
+        <select #leadSelect id="lead-select" class="field-control" (change)="setLead(leadSelect.value)">
+          <option value="" [selected]="!current.leadUid">Aucun</option>
+          @for (member of members(); track member.uid) {
+            <option [value]="member.uid" [selected]="member.uid === current.leadUid">{{ member.displayName }}{{ member.mock ? ' (sans compte)' : '' }}</option>
+          }
+        </select>
+      </div>
+      @if (error(); as message) {
+        <p class="error-message" role="alert">{{ message }}</p>
+      }
+      <div class="admin-actions">
+        @if (confirmingRemoval()) {
+          <span role="alert">Supprimer la commission et toutes ses tâches ?</span>
+          <button type="button" class="btn btn-danger btn-small" (click)="removeCommission()">Oui, supprimer</button>
+          <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
+        } @else {
+          <button type="button" class="btn btn-danger btn-small" (click)="askRemoval()">Supprimer la commission</button>
+        }
+      </div>
+    </div>
+  }
+
+  <section aria-labelledby="tasks-title">
+    <div class="section-header">
+      <h2 id="tasks-title" class="section-title">Tâches</h2>
+      <button type="button" class="btn btn-primary btn-small" (click)="startAdding()">+ Nouvelle tâche</button>
+    </div>
+    @if (rows().length) {
+      <ul class="card-list">
+        @for (row of rows(); track row.task.id) {
+          <li><app-task-item [task]="row.task" [projectName]="row.projectName" [canManage]="canManage()" /></li>
+        }
+      </ul>
+    } @else {
+      <p class="empty-state">Aucune tâche pour cette commission.</p>
+    }
+  </section>
+
+  @if (adding()) {
+    <app-modal title="Nouvelle tâche" (closed)="stopAdding()">
+      <app-task-form [fixedCommissionId]="id()" [projects]="projects()" (done)="stopAdding()" />
+    </app-modal>
+  }
+} @else if (commission() === null) {
+  <p class="empty-state">Commission introuvable.</p>
+}

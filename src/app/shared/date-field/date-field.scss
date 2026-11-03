@@ -1,0 +1,87 @@
+@use '../../../styles/variables' as *;
+
+.date-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.date-toggle {
+  flex: none;
+  min-width: 44px;
+  padding: 0;
+}
+
+.date-picker {
+  width: min(320px, 100%);
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid $color-border;
+  border-radius: 12px;
+  background: $color-surface;
+  box-shadow: $shadow-hover;
+}
+
+.date-picker-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.date-picker-month {
+  color: $color-primary-dark;
+  font-weight: 700;
+}
+
+.date-picker-weekdays,
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.date-picker-weekdays {
+  margin-bottom: 4px;
+  color: $color-text-muted;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.date-day {
+  min-height: 38px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: $color-text;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: $color-primary-tint;
+  }
+}
+
+.date-day-today {
+  border-color: $color-primary;
+}
+
+.date-day-selected {
+  background: $color-primary;
+  color: #ffffff;
+  font-weight: 700;
+
+  &:hover {
+    background: $color-primary-dark;
+  }
+}
+
+.date-picker-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}

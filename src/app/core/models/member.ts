@@ -1,0 +1,15 @@
+export type MemberRole = 'admin' | 'member';
+export type MemberStatus = 'pending' | 'approved';
+
+export interface Member {
+  uid: string;
+  displayName: string;
+  email: string;
+  photoURL: string | null;
+  role: MemberRole;
+  status: MemberStatus;
+  // Notifications par e-mail (affectation, ajout comme aidant) ; activées par défaut.
+  emailNotifications?: boolean;
+  // Personne sans compte Google (uid « mock-… ») : un admin la remplace par le vrai compte quand il existe.
+  mock?: boolean;
+}

@@ -1,0 +1,16 @@
+@if (photoUrl(); as url) {
+  <!-- Photo dynamique (URL Google ou image en base64) : NgOptimizedImage ne s'applique pas. -->
+  <img
+    class="avatar avatar-image"
+    [class.avatar-small]="small()"
+    [src]="url"
+    alt=""
+    referrerpolicy="no-referrer"
+    width="28"
+    height="28"
+  />
+} @else {
+  <span class="avatar" [class.avatar-small]="small()" [class.avatar-light]="light()" aria-hidden="true">{{
+    initial()
+  }}</span>
+}

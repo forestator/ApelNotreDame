@@ -1,0 +1,22 @@
+@use '../../../styles/variables' as *;
+
+.progress-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 6px;
+}
+
+.progress-percent {
+  color: $color-primary-dark;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.progress-detail {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+}

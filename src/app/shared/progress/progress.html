@@ -1,0 +1,20 @@
+<div class="progress-info">
+  <span class="progress-percent">{{ percent() }} %</span>
+  <span class="progress-detail">
+    @if (total()) {
+      {{ done() }}/{{ total() }} tâche(s) terminée(s)
+    } @else {
+      Aucune tâche
+    }
+  </span>
+</div>
+<div
+  class="progress"
+  role="progressbar"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  [attr.aria-valuenow]="percent()"
+  [attr.aria-label]="label()"
+>
+  <div class="progress-bar" [style.width.%]="percent()"></div>
+</div>

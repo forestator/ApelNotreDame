@@ -1,0 +1,16 @@
+@use '../../../styles/variables' as *;
+
+// Sans sélection, le menu garde son style neutre ; avec une sélection, il prend la couleur choisie.
+.select-toned {
+  border-left: 8px solid var(--tone, #6b7280);
+  background: var(--tone-tint, #{$color-surface});
+  color: var(--tone, #{$color-text});
+  font-weight: 600;
+}
+
+// Les navigateurs qui le permettent (Chrome, Firefox) colorent aussi chaque ligne de la liste ouverte.
+.select-option {
+  background: var(--tone-tint);
+  color: var(--tone);
+  font-weight: 600;
+}

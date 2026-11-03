@@ -1,0 +1,126 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function member() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data;
+    }
+
+    function isApproved() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && member().status == 'approved';
+    }
+
+    function memberOf(uid) {
+      return get(/databases/$(database)/documents/members/$(uid)).data;
+    }
+
+    function isApprovedMember(uid) {
+      return exists(/databases/$(database)/documents/members/$(uid)) && memberOf(uid).status == 'approved';
+    }
+
+    function isAdmin() {
+      return isApproved() && member().role == 'admin';
+    }
+
+    function isLead(commissionId) {
+      return get(/databases/$(database)/documents/commissions/$(commissionId)).data.leadUid == request.auth.uid;
+    }
+
+    // Les membres ne sont lisibles que par les membres approuvés (et par eux-mêmes).
+    // Le tout premier admin se crée à la main depuis la console Firebase (voir README).
+    match /members/{uid} {
+      allow read: if isApproved() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.role == 'member';
+      // Fiche provisoire créée par un admin pour une personne qui n'a pas encore de compte.
+      allow create: if isAdmin()
+        && uid.matches('mock-.*')
+        && request.resource.data.uid == uid
+        && request.resource.data.mock == true
+        && request.resource.data.status == 'approved'
+        && request.resource.data.role == 'member';
+      allow delete: if isAdmin();
+      // Chacun peut modifier son nom, sa photo (≈ 200 Ko max en base64) et ses préférences d'e-mail, rien d'autre.
+      allow update: if isAdmin()
+        || (signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'emailNotifications'])
+          && request.resource.data.displayName is string
+          && request.resource.data.displayName.size() > 0
+          && request.resource.data.displayName.size() <= 60
+          && (request.resource.data.photoURL == null
+            || (request.resource.data.photoURL is string && request.resource.data.photoURL.size() < 200000))
+          && request.resource.data.get('emailNotifications', true) is bool);
+    }
+
+    match /commissions/{commissionId} {
+      allow read: if isApproved();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (isApproved() && resource.data.leadUid == request.auth.uid);
+    }
+
+    match /projects/{projectId} {
+      allow read: if isApproved();
+      allow write: if isAdmin();
+    }
+
+    match /tasks/{taskId} {
+      allow read: if isApproved();
+      allow create: if isApproved() && request.resource.data.createdBy == request.auth.uid;
+
+      allow update: if isAdmin()
+        || (isApproved() && isLead(resource.data.commissionId))
+        || (isApproved() && resource.data.assigneeUid == request.auth.uid)
+        // Tout membre approuvé peut affecter une tâche libre (à lui-même ou à un autre membre approuvé) :
+        // seuls l'assignation et le statut changent.
+        || (isApproved()
+          && resource.data.assigneeUid == null
+          && request.resource.data.assigneeUid is string
+          && isApprovedMember(request.resource.data.assigneeUid)
+          && request.resource.data.assigneeName == memberOf(request.resource.data.assigneeUid).displayName
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['assigneeUid', 'assigneeName', 'status']))
+        // Tout membre approuvé peut commenter : seul le compteur de commentaires bouge, d'un cran.
+        || (isApproved()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentCount'])
+          && math.abs(request.resource.data.commentCount - resource.data.get('commentCount', 0)) == 1)
+        // Tout membre approuvé peut s'inscrire (ou se désinscrire) comme aidant, sous son propre nom.
+        || (isApproved()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpers'])
+          && request.resource.data.helpers.diff(resource.data.get('helpers', {})).affectedKeys().hasOnly([request.auth.uid])
+          && (!(request.auth.uid in request.resource.data.helpers)
+            || request.resource.data.helpers[request.auth.uid] == member().displayName));
+
+      allow delete: if isAdmin()
+        || (isApproved() && (isLead(resource.data.commissionId) || resource.data.createdBy == request.auth.uid));
+
+      match /comments/{commentId} {
+        allow read: if isApproved();
+        allow create: if isApproved()
+          && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'text', 'createdAt'])
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorName == member().displayName
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 2000
+          && request.resource.data.createdAt == request.time;
+        // L'auteur retire son commentaire ; un admin, le responsable de la commission ou le créateur de la tâche peuvent
+        // aussi le faire (modération, et suppression de la tâche elle-même).
+        allow delete: if isAdmin()
+          || (isApproved()
+            && (resource.data.authorUid == request.auth.uid
+              || isLead(get(/databases/$(database)/documents/tasks/$(taskId)).data.commissionId)
+              || get(/databases/$(database)/documents/tasks/$(taskId)).data.createdBy == request.auth.uid));
+      }
+    }
+  }
+}

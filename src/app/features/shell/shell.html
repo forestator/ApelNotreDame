@@ -1,0 +1,49 @@
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+
+<header class="shell-header">
+  <div class="shell-bar">
+    <a routerLink="/" class="shell-brand">
+      <img ngSrc="logo.jpeg" width="44" height="44" alt="" class="shell-logo" priority />
+      <span>APEL Notre-Dame</span>
+    </a>
+
+    <nav aria-label="Navigation principale">
+      <ul class="shell-nav">
+        <li>
+          <a routerLink="/" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+            Tableau de bord
+          </a>
+        </li>
+        <li>
+          <a routerLink="/projets" routerLinkActive="nav-link-active" class="nav-link">Projets</a>
+        </li>
+        <li>
+          <a routerLink="/commissions" routerLinkActive="nav-link-active" class="nav-link">Commissions</a>
+        </li>
+        <li>
+          <a routerLink="/calendrier" routerLinkActive="nav-link-active" class="nav-link">Calendrier</a>
+        </li>
+        @if (isAdmin()) {
+          <li>
+            <a routerLink="/membres" routerLinkActive="nav-link-active" class="nav-link">Membres</a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="shell-user">
+      @if (member(); as current) {
+        <a routerLink="/profil" class="shell-user-link">
+          <app-avatar [name]="current.displayName" [photoUrl]="current.photoURL" [light]="true" />
+          <span class="shell-user-name">{{ current.displayName }}</span>
+          <span class="visually-hidden">(mon profil)</span>
+        </a>
+      }
+      <button type="button" class="btn btn-small shell-logout" (click)="signOut()">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<main id="contenu" class="page" tabindex="-1">
+  <router-outlet />
+</main>

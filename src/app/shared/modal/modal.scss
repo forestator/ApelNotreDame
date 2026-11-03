@@ -1,0 +1,40 @@
+@use '../../../styles/variables' as *;
+
+.modal {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: $radius-large;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  color: $color-text;
+
+  &::backdrop {
+    background: rgba(16, 40, 38, 0.55);
+  }
+}
+
+.modal-panel {
+  padding: 20px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  margin: 0;
+  color: $color-primary-dark;
+  font-size: 1.3rem;
+}
+
+.modal-close {
+  min-width: 36px;
+  padding: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+}

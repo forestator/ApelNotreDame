@@ -1,0 +1,42 @@
+<section class="comments" aria-label="Commentaires">
+  @if (rows().length) {
+    <ul class="comment-list">
+      @for (row of rows(); track row.id) {
+        <li class="comment">
+          <app-avatar [name]="row.name" [photoUrl]="row.photo" />
+          <div class="comment-body">
+            <p class="comment-head">
+              <strong>{{ row.name }}</strong>
+              <span class="muted">
+                @if (row.date; as date) {
+                  · {{ date | date: 'dd/MM/yyyy HH:mm' }}
+                } @else {
+                  · à l'instant
+                }
+              </span>
+              @if (row.removable) {
+                <button type="button" class="comment-remove" (click)="remove(row.id)">
+                  Supprimer<span class="visually-hidden"> le commentaire de {{ row.name }}</span>
+                </button>
+              }
+            </p>
+            <p class="comment-text">{{ row.text }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="muted comment-empty">Pas encore de commentaire.</p>
+  }
+
+  <form class="comment-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field-label" [attr.for]="id">Ajouter un commentaire</label>
+    <textarea [id]="id" class="field-control" rows="2" maxlength="2000" formControlName="text"></textarea>
+    @if (error(); as message) {
+      <p class="error-message" role="alert">{{ message }}</p>
+    }
+    <div>
+      <button type="submit" class="btn btn-primary btn-small" [disabled]="form.invalid">Publier</button>
+    </div>
+  </form>
+</section>

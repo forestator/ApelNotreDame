@@ -1,0 +1,62 @@
+@use '../../../styles/variables' as *;
+
+.comments {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: $color-bg;
+}
+
+.comment-list {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.comment {
+  display: flex;
+  gap: 10px;
+}
+
+.comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.comment-text {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.comment-empty {
+  margin: 0 0 12px;
+}
+
+.comment-remove {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $color-danger;
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.comment-form {
+  display: grid;
+  gap: 8px;
+}

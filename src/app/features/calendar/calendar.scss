@@ -1,0 +1,214 @@
+@use '../../../styles/variables' as *;
+
+.overdue {
+  margin-bottom: 20px;
+  border-color: $color-danger;
+}
+
+.overdue-title {
+  margin: 0 0 8px;
+  color: $color-danger;
+  font-size: 1.1rem;
+}
+
+.overdue-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overdue-date {
+  display: inline-block;
+  min-width: 5.5em;
+  color: $color-danger;
+  font-weight: 700;
+}
+
+.calendar-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar-month {
+  min-width: 11em;
+  margin: 0;
+  color: $color-primary-dark;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.calendar-today {
+  margin-left: auto;
+}
+
+.weekdays,
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weekdays {
+  margin-bottom: 6px;
+  color: $color-text-muted;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.day {
+  min-height: 96px;
+  padding: 6px;
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  background: $color-surface;
+}
+
+.day-blank {
+  border-color: transparent;
+  background: transparent;
+}
+
+.day-today {
+  border: 2px solid $color-primary;
+  box-shadow: $shadow-card;
+
+  .day-number {
+    background: $color-primary;
+    color: #ffffff;
+  }
+}
+
+.day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.day-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid $color-border;
+  border-radius: 50%;
+  background: $color-surface;
+  color: $color-primary;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-primary;
+    background: $color-primary-tint;
+  }
+}
+
+// Lue par les lecteurs d'écran ; visible seulement dans la liste mobile.
+.day-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.day-events {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event {
+  display: block;
+  padding: 3px 6px;
+  border-left: 4px solid var(--tone);
+  border-radius: 4px 6px 6px 4px;
+  background: var(--tone-tint);
+  color: var(--tone);
+  font-size: 0.8rem;
+  line-height: 1.25;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.event-title {
+  display: block;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.event-subtitle {
+  display: block;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+}
+
+.event-done .event-title {
+  text-decoration: line-through;
+}
+
+.calendar-empty {
+  margin-top: 16px;
+}
+
+// Petit écran : une liste des seuls jours qui ont une échéance.
+@media (max-width: 720px) {
+  .weekdays,
+  .day-blank,
+  .day-empty {
+    display: none;
+  }
+
+  .days {
+    grid-template-columns: 1fr;
+  }
+
+  .day {
+    min-height: 0;
+  }
+
+  .day-number {
+    display: none;
+  }
+
+  .day-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    color: $color-primary-dark;
+    font-weight: 700;
+  }
+}

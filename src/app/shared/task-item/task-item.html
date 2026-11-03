@@ -1,0 +1,174 @@
+@if (editing()) {
+  <app-task-form [task]="task()" [commissions]="commissions()" [projects]="projects()" (done)="stopEditing()" />
+} @else {
+  <article class="card task" [class]="stripeClass()">
+    <div class="task-head">
+      <h3 class="task-title">{{ task().title }}</h3>
+      <span class="badge" [class]="statusClass()">{{ statusLabel() }}</span>
+    </div>
+
+    @if (projectName() || commissionName()) {
+      <p class="task-chips">
+        @if (projectName(); as name) {
+          <a class="chip chip-project" [class]="projectTone()" [routerLink]="['/projets', task().projectId]">Projet · {{ name }}</a>
+        }
+        @if (commissionName(); as name) {
+          <a class="chip chip-commission" [class]="commissionTone()" [routerLink]="['/commissions', task().commissionId]">{{ name }}</a>
+        }
+      </p>
+    }
+
+    @if (task().description) {
+      <p class="task-description">{{ task().description }}</p>
+    }
+
+    @if (!isFree() || task().dueDate) {
+      <p class="task-meta">
+        @if (!isFree()) {
+          <app-avatar [name]="assigneeName()" [photoUrl]="assigneePhoto()" />
+          <span>Responsable : <strong>{{ assigneeName() }}</strong></span>
+        }
+        @if (task().dueDate; as due) {
+          <span>📅 {{ due | date: 'dd/MM/yyyy' }}</span>
+        }
+      </p>
+    }
+
+    @if (helperEntries().length || helpersNeeded()) {
+      <div class="task-helpers">
+        <span class="task-helpers-title">
+          Aidants
+          @if (helpersNeeded()) {
+            : {{ helperEntries().length }}/{{ helpersNeeded() }}
+            @if (helpersMissing()) {
+              <strong class="task-missing">· il en manque {{ helpersMissing() }}</strong>
+            }
+          }
+        </span>
+        <ul class="task-helper-list">
+          @for (helper of helperEntries(); track helper.uid) {
+            <li class="task-helper">
+              <app-avatar [name]="helper.name" [photoUrl]="helper.photo" [small]="true" />
+              {{ helper.name }}
+              @if (helper.removable) {
+                <button type="button" class="task-helper-remove" (click)="removeHelper(helper.uid)">
+                  <span aria-hidden="true">×</span
+                  ><span class="visually-hidden">Retirer {{ helper.name }} des aidants</span>
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (primaryAction() || canEditStatus() || hasMenu()) {
+      <div class="task-footer">
+        @switch (primaryAction()) {
+          @case ('take') {
+            <button type="button" class="btn btn-primary btn-small" (click)="take()">Je m'en occupe</button>
+          }
+          @case ('join') {
+            <button type="button" class="btn btn-primary btn-small" (click)="join()">🙋 Je peux aider</button>
+          }
+        }
+
+        <span class="task-footer-end">
+          @if (canEditStatus()) {
+            <label class="task-status">
+              <span class="visually-hidden">Statut de la tâche {{ task().title }}</span>
+              <select #statusSelect class="field-control task-select-control" (change)="setStatus(statusSelect.value)">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value" [selected]="option.value === task().status">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+          }
+          @if (hasMenu()) {
+            <button
+              type="button"
+              class="btn btn-small"
+              [attr.aria-expanded]="menuOpen()"
+              [attr.aria-controls]="menuId"
+              (click)="toggleMenu()"
+            >
+              Gérer <span aria-hidden="true">{{ menuOpen() ? '▴' : '▾' }}</span>
+              <span class="visually-hidden">la tâche {{ task().title }}</span>
+            </button>
+          }
+        </span>
+      </div>
+    }
+
+    @if (menuOpen()) {
+      <div class="task-menu" [id]="menuId">
+        @if (canAssign()) {
+          <label class="task-menu-field">
+            <span class="field-label">Responsable</span>
+            <select #assignSelect class="field-control" (change)="assign(assignSelect.value)">
+              <option value="" [selected]="isFree()">Personne</option>
+              @for (member of members(); track member.uid) {
+                <option [value]="member.uid" [selected]="member.uid === task().assigneeUid">
+                  {{ member.displayName }}{{ member.mock ? ' (sans compte)' : '' }}
+                </option>
+              }
+            </select>
+          </label>
+        }
+
+        @if (canManageHelpers() && addableHelpers().length) {
+          <label class="task-menu-field">
+            <span class="field-label">Ajouter un aidant</span>
+            <select
+              #helperSelect
+              class="field-control"
+              (change)="addHelper(helperSelect.value); helperSelect.value = ''"
+            >
+              <option value="">Choisir un membre…</option>
+              @for (member of addableHelpers(); track member.uid) {
+                <option [value]="member.uid">{{ member.displayName }}{{ member.mock ? ' (sans compte)' : '' }}</option>
+              }
+            </select>
+          </label>
+        }
+
+        <div class="task-menu-actions">
+          @if (joinInMenu()) {
+            <button type="button" class="btn btn-small" (click)="join()">🙋 Je peux aider</button>
+          }
+          @if (canEdit()) {
+            <button type="button" class="btn btn-small" (click)="startEditing()">✏️ Modifier</button>
+          }
+          @if (canManage()) {
+            @if (confirmingRemoval()) {
+              <span role="alert" class="task-confirm">Supprimer cette tâche ?</span>
+              <button type="button" class="btn btn-danger btn-small" (click)="remove()">Oui, supprimer</button>
+              <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
+            } @else {
+              <button type="button" class="btn btn-danger btn-small" (click)="askRemoval()">Supprimer</button>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <button
+      type="button"
+      class="task-comments-toggle"
+      [attr.aria-expanded]="commentsOpen()"
+      [attr.aria-controls]="commentsId"
+      (click)="toggleComments()"
+    >
+      💬 Commentaires
+      @if (commentCount()) {
+        <span>({{ commentCount() }})</span>
+      }
+      <span class="visually-hidden">de la tâche {{ task().title }}</span>
+    </button>
+    @if (commentsOpen()) {
+      <div [id]="commentsId">
+        <app-task-comments [taskId]="task().id" [canModerate]="canManage()" />
+      </div>
+    }
+  </article>
+}

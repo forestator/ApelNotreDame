@@ -1,0 +1,55 @@
+// Contrastes vérifiés pour WCAG AA (texte >= 4.5:1).
+// Couleurs tirées du logo (pissenlit turquoise, cœur magenta).
+// Le turquoise d'origine n'a que 2,7:1 sur blanc : il reste décoratif.
+$color-brand-teal: #20b0a8;
+$color-brand-magenta: #c80078;
+$color-primary: #0e6b66;
+$color-primary-dark: #0b5a56;
+$color-primary-tint: #e3f4f2;
+$color-accent: #a3135f;
+$color-text: #1c2430;
+$color-text-muted: #4b5563;
+$color-bg: #f2f9f8;
+$color-surface: #ffffff;
+$color-border: #c3d6d4;
+$color-danger: #b42318;
+$color-focus: #0b5fff;
+
+$color-todo-bg: #e5e7eb;
+$color-todo-text: #1f2937;
+$color-progress-bg: #fde8c8;
+$color-progress-text: #7a3a05;
+$color-done-bg: #d3f0dc;
+$color-done-text: #14532d;
+
+$font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+$radius: 8px;
+$gap: 16px;
+$content-width: 960px;
+
+$color-primary-light: #138c85;
+$color-chip-project-bg: #fde7f2;
+$color-chip-project-text: #8a0f50;
+$color-chip-commission-bg: #dff3f1;
+$color-chip-commission-text: #0b5a56;
+$color-stripe-todo: #8a94a6;
+$color-stripe-progress: #d97706;
+$color-stripe-done: #15803d;
+
+// Une couleur par commission. Les clés doivent correspondre à COMMISSION_TONES (commission.ts).
+// Chaque couleur sur sa teinte claire, et sur blanc, dépasse 5:1 (WCAG AA).
+$commission-tones: (
+  'teal': ('#0e6b66', '#dff3f1'),
+  'blue': ('#1d4ed8', '#e0e9ff'),
+  'purple': ('#6d28d9', '#ede9fe'),
+  'magenta': ('#a3135f', '#fde7f2'),
+  'red': ('#b91c1c', '#fee2e2'),
+  'orange': ('#a24a07', '#ffedd5'),
+  'green': ('#15693a', '#dcfce7'),
+  'slate': ('#475569', '#e2e8f0'),
+);
+
+$gradient-brand: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+$shadow-card: 0 1px 2px rgba(16, 40, 38, 0.06), 0 6px 18px rgba(16, 40, 38, 0.07);
+$shadow-hover: 0 2px 4px rgba(16, 40, 38, 0.08), 0 12px 28px rgba(16, 40, 38, 0.12);
+$radius-large: 16px;

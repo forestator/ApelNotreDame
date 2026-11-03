@@ -1,0 +1,66 @@
+<p><a class="link" routerLink="/projets">← Tous les projets</a></p>
+
+@if (project(); as current) {
+  @if (editing()) {
+    <app-project-form [project]="current" (done)="stopEditing()" />
+  } @else {
+    <h1 class="page-title project-title" [class]="tone()">{{ current.name }}</h1>
+    @if (current.description) {
+      <p>{{ current.description }}</p>
+    }
+    @if (current.dueDate; as due) {
+      <p class="meta-line">📅 Échéance : {{ due | date: 'dd/MM/yyyy' }}</p>
+    }
+    @if (isAdmin()) {
+      <button type="button" class="btn btn-small" (click)="startEditing()">Modifier le projet</button>
+    }
+  }
+
+  <div class="card detail-progress" [class]="tone()">
+    <app-progress [done]="doneCount()" [total]="totalCount()" [label]="'Avancement de ' + current.name" />
+  </div>
+
+  @if (isAdmin()) {
+    <div class="card form admin-box">
+      @if (error(); as message) {
+        <p class="error-message" role="alert">{{ message }}</p>
+      }
+      <div class="admin-actions">
+        @if (confirmingRemoval()) {
+          <span role="alert">Supprimer le projet ? Ses tâches restent dans leurs commissions.</span>
+          <button type="button" class="btn btn-danger btn-small" (click)="removeProject()">Oui, supprimer</button>
+          <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
+        } @else {
+          <button type="button" class="btn btn-danger btn-small" (click)="askRemoval()">Supprimer le projet</button>
+        }
+      </div>
+    </div>
+  }
+
+  <section aria-labelledby="tasks-title">
+    <div class="section-header">
+      <h2 id="tasks-title" class="section-title">Tâches</h2>
+      <button type="button" class="btn btn-primary btn-small" (click)="startAdding()">+ Nouvelle tâche</button>
+    </div>
+    @for (group of groups(); track group.commission.id) {
+      <h3 class="group-title group-tone" [class]="group.tone">
+        <a class="link" [routerLink]="['/commissions', group.commission.id]">{{ group.commission.name }}</a>
+      </h3>
+      <ul class="card-list">
+        @for (task of group.tasks; track task.id) {
+          <li><app-task-item [task]="task" [canManage]="group.canManage" /></li>
+        }
+      </ul>
+    } @empty {
+      <p class="empty-state">Aucune tâche pour ce projet.</p>
+    }
+  </section>
+
+  @if (adding()) {
+    <app-modal title="Nouvelle tâche" (closed)="stopAdding()">
+      <app-task-form [fixedProjectId]="id()" [commissions]="commissions()" (done)="stopAdding()" />
+    </app-modal>
+  }
+} @else if (project() === null) {
+  <p class="empty-state">Projet introuvable.</p>
+}

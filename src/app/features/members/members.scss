@@ -1,0 +1,39 @@
+@use '../../../styles/variables' as *;
+
+.member-row,
+.placeholder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.member-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.placeholder-target {
+  display: inline-block;
+}
+
+.placeholder-form {
+  max-width: 420px;
+  margin-top: 16px;
+}
+
+.placeholder-select {
+  width: auto;
+  min-height: 36px;
+  padding-block: 4px;
+  font-size: 0.9rem;
+}

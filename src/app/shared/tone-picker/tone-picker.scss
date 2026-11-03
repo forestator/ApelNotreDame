@@ -1,0 +1,36 @@
+@use '../../../styles/variables' as *;
+
+.tone-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tone-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.tone-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 6px;
+  border: 2px solid $color-border;
+  border-radius: 999px;
+  background: $color-surface;
+  cursor: pointer;
+
+  &:has(input:checked) {
+    border-color: var(--tone);
+    background: var(--tone-tint);
+    font-weight: 700;
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid $color-focus;
+    outline-offset: 2px;
+  }
+}

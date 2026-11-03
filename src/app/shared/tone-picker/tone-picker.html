@@ -1,0 +1,12 @@
+<fieldset class="tone-picker">
+  <legend class="field-label">{{ legend() }}</legend>
+  <div class="tone-options">
+    @for (tone of tones; track tone.key) {
+      <label class="tone-option" [class]="'tone-option tone-' + tone.key">
+        <input type="radio" class="visually-hidden" [name]="groupName" [value]="tone.key" [formControl]="control()" />
+        <span class="tone-swatch" aria-hidden="true"></span>
+        <span>{{ tone.label }}</span>
+      </label>
+    }
+  </div>
+</fieldset>

@@ -1,0 +1,73 @@
+<section class="hero" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="hero-title">Bonjour {{ member()?.displayName }} 👋</h1>
+  <p class="hero-text">Voici ce qui vous attend à l'APEL Notre-Dame.</p>
+
+  <dl class="stat-grid">
+    <div class="stat-tile">
+      <dt>Mes tâches en cours</dt>
+      <dd>{{ myTasks().length }}</dd>
+    </div>
+    <div class="stat-tile">
+      <dt>Coups de main</dt>
+      <dd>{{ helpTasks().length }}</dd>
+    </div>
+    <div class="stat-tile">
+      <dt>Tâches à prendre</dt>
+      <dd>{{ freeTasks().length }}</dd>
+    </div>
+    <div class="stat-tile">
+      <dt>Projets</dt>
+      <dd>{{ projectCount() }}</dd>
+    </div>
+    <div class="stat-tile">
+      <dt>Commissions</dt>
+      <dd>{{ commissionCount() }}</dd>
+    </div>
+  </dl>
+</section>
+
+<section aria-labelledby="my-tasks-title">
+  <h2 id="my-tasks-title" class="section-title">Mes tâches en cours</h2>
+  <p class="meta-line">En tant que responsable ou aidant.</p>
+  @if (myTasks().length) {
+    <ul class="card-list">
+      @for (row of myTasks(); track row.task.id) {
+        <li>
+          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Vous n'avez aucune tâche en cours. Jetez un œil aux tâches à prendre ci-dessous 👇</p>
+  }
+</section>
+
+<section aria-labelledby="help-tasks-title">
+  <h2 id="help-tasks-title" class="section-title">Coups de main recherchés</h2>
+  @if (helpTasks().length) {
+    <ul class="card-list">
+      @for (row of helpTasks(); track row.task.id) {
+        <li>
+          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Personne n'a besoin de renfort pour le moment.</p>
+  }
+</section>
+
+<section aria-labelledby="free-tasks-title">
+  <h2 id="free-tasks-title" class="section-title">Tâches à prendre</h2>
+  @if (freeTasks().length) {
+    <ul class="card-list">
+      @for (row of freeTasks(); track row.task.id) {
+        <li>
+          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Toutes les tâches ont un responsable. Merci ! 🎉</p>
+  }
+</section>
