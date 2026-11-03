@@ -39,7 +39,7 @@ Firestore, modifier ce document : `status = "approved"` et `role = "admin"`. Les
 ## Déploiement
 
 ```bash
-ng build && firebase deploy
+npm run deploy
 ```
 
 ## Logo et couleurs
