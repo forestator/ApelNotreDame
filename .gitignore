@@ -49,3 +49,6 @@ service-account*.json
 
 # Données issues de la conversation WhatsApp privée (prénoms, montants) : ne pas publier
 src/app/core/data/seed-data.ts
+
+# Cache local du CLI Firebase
+.firebase/
