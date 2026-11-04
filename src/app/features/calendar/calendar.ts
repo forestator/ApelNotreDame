@@ -1,22 +1,31 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommissionService } from '../../core/data/commission.service';
 import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
+import { headcount, isFull, Task } from '../../core/models/task';
 import { toneClass } from '../../core/models/tone';
-import { dayLabel, daysInMonth, leadingBlanks, monthLabel, toIso, WEEKDAYS } from '../../core/utils/calendar-math';
+import {
+  dayLabel,
+  daysInMonth,
+  leadingBlanks,
+  monthLabel,
+  toIso,
+  WEEKDAYS,
+} from '../../core/utils/calendar-math';
+import { formatTime } from '../../core/utils/french-time';
 import { Modal } from '../../shared/modal/modal';
 import { TaskForm } from '../../shared/task-form/task-form';
 
 interface CalendarEvent {
   id: string;
   date: string;
+  time: string;
   title: string;
   subtitle: string;
   kind: 'task' | 'project';
   link: string[];
   tone: string;
-  done: boolean;
+  full: boolean;
 }
 
 @Component({
@@ -29,16 +38,14 @@ interface CalendarEvent {
 export class Calendar {
   private readonly taskService = inject(TaskService);
   private readonly projectService = inject(ProjectService);
-  private readonly commissionService = inject(CommissionService);
 
   private readonly now = new Date();
   protected readonly todayIso = toIso(this.now.getFullYear(), this.now.getMonth(), this.now.getDate());
   protected readonly weekdays = WEEKDAYS;
-  protected readonly commissions = this.commissionService.commissions;
   protected readonly projects = this.projectService.projects;
 
   protected readonly adding = signal(false);
-  // Jour cliqué (aaaa-mm-jj) : devient l'échéance préremplie de la nouvelle tâche.
+  // Jour cliqué (aaaa-mm-jj) : devient la date préremplie de la nouvelle tâche.
   protected readonly addDate = signal<string | undefined>(undefined);
 
   // Mois affiché (0 = janvier).
@@ -47,25 +54,24 @@ export class Calendar {
   protected readonly monthLabel = computed(() => monthLabel(this.visible().year, this.visible().month));
 
   private readonly events = computed<CalendarEvent[]>(() => {
-    const commissions = new Map(this.commissionService.commissions().map((commission) => [commission.id, commission]));
     const projects = new Map(this.projectService.projects().map((project) => [project.id, project]));
 
     const taskEvents = this.taskService
       .tasks()
-      .filter((task) => task.dueDate)
+      .filter((task): task is Task & { date: string } => !!task.date)
       .map<CalendarEvent>((task) => {
-        const commission = commissions.get(task.commissionId);
-        const project = task.projectId ? projects.get(task.projectId) : undefined;
+        const project = projects.get(task.projectId);
+        const people = task.needed > 0 ? `${headcount(task)}/${task.needed} pers.` : `${headcount(task)} inscrit(s)`;
         return {
           id: `task-${task.id}`,
-          date: task.dueDate as string,
+          date: task.date,
+          time: task.time ?? '',
           title: task.title,
-          subtitle: [project?.name, commission?.name].filter(Boolean).join(' · '),
+          subtitle: [formatTime(task.time), people].filter(Boolean).join(' · '),
           kind: 'task',
-          link: ['/commissions', task.commissionId],
-          // La couleur du projet prime : c'est lui qui regroupe les échéances.
-          tone: toneClass((project ?? commission)?.color),
-          done: task.status === 'done',
+          link: ['/projets', task.projectId],
+          tone: toneClass(project?.color),
+          full: isFull(task),
         };
       });
 
@@ -75,25 +81,34 @@ export class Calendar {
       .map<CalendarEvent>((project) => ({
         id: `project-${project.id}`,
         date: project.dueDate as string,
+        time: '',
         title: project.name,
         subtitle: 'Date du projet',
         kind: 'project',
         link: ['/projets', project.id],
         tone: toneClass(project.color),
-        done: false,
+        full: false,
       }));
 
-    return [...projectEvents, ...taskEvents];
+    // Dans une même journée : l'événement du projet d'abord, puis les tâches par heure.
+    return [...projectEvents, ...taskEvents].sort(
+      (first, second) => first.date.localeCompare(second.date) || first.time.localeCompare(second.time),
+    );
   });
 
   // Une case par jour du mois, précédée de cases vides pour aligner sur le lundi.
   protected readonly cells = computed(() => {
     const { year, month } = this.visible();
-    const leading = leadingBlanks(year, month);
     const byDate = new Map<string, CalendarEvent[]>();
     for (const event of this.events()) byDate.set(event.date, [...(byDate.get(event.date) ?? []), event]);
 
-    const blanks = Array.from({ length: leading }, (_, index) => ({ key: `blank-${index}`, day: 0 }));
+    const blanks = Array.from({ length: leadingBlanks(year, month) }, (_, index) => ({
+      key: `blank-${index}`,
+      day: 0,
+      label: '',
+      isToday: false,
+      events: [] as CalendarEvent[],
+    }));
     const days = Array.from({ length: daysInMonth(year, month) }, (_, index) => {
       const day = index + 1;
       const iso = toIso(year, month, day);
@@ -105,17 +120,10 @@ export class Calendar {
         events: byDate.get(iso) ?? [],
       };
     });
-    return [...blanks.map((blank) => ({ ...blank, label: '', isToday: false, events: [] as CalendarEvent[] })), ...days];
+    return [...blanks, ...days];
   });
 
   protected readonly monthEventCount = computed(() => this.cells().reduce((total, cell) => total + cell.events.length, 0));
-
-  protected readonly overdue = computed(() =>
-    this.events()
-      .filter((event) => event.kind === 'task' && !event.done && event.date < this.todayIso)
-      .sort((first, second) => first.date.localeCompare(second.date))
-      .map((event) => ({ ...event, dateLabel: event.date.split('-').reverse().join('/') })),
-  );
 
   protected startAdding(isoDate?: string): void {
     this.addDate.set(isoDate);

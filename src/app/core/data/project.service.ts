@@ -47,11 +47,15 @@ export class ProjectService {
     return updateDoc(doc(this.firestore, `projects/${id}`), changes);
   }
 
-  /** Les tâches appartiennent aussi à une commission : elles sont détachées du projet, pas supprimées. */
+  /** Supprime aussi les tâches du projet (et leurs commentaires) : une tâche vit toujours dans un projet. */
   async remove(id: string): Promise<void> {
     const tasks = await getDocs(query(collection(this.firestore, 'tasks'), where('projectId', '==', id)));
+    const comments = await Promise.all(
+      tasks.docs.map((task) => getDocs(collection(this.firestore, `tasks/${task.id}/comments`))),
+    );
     const batch = writeBatch(this.firestore);
-    tasks.forEach((task) => batch.update(task.ref, { projectId: null }));
+    comments.forEach((snapshot) => snapshot.forEach((comment) => batch.delete(comment.ref)));
+    tasks.forEach((task) => batch.delete(task.ref));
     batch.delete(doc(this.firestore, `projects/${id}`));
     await batch.commit();
   }

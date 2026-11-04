@@ -1,31 +1,5 @@
 @use '../../../styles/variables' as *;
 
-.overdue {
-  margin-bottom: 20px;
-  border-color: $color-danger;
-}
-
-.overdue-title {
-  margin: 0 0 8px;
-  color: $color-danger;
-  font-size: 1.1rem;
-}
-
-.overdue-list {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.overdue-date {
-  display: inline-block;
-  min-width: 5.5em;
-  color: $color-danger;
-  font-weight: 700;
-}
-
 .calendar-bar {
   display: flex;
   flex-wrap: wrap;
@@ -172,10 +146,6 @@
   display: block;
   opacity: 0.9;
   overflow-wrap: anywhere;
-}
-
-.event-done .event-title {
-  text-decoration: line-through;
 }
 
 .calendar-empty {

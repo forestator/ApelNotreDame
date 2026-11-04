@@ -1,25 +1,10 @@
 <div class="page-header">
   <div>
     <h1 class="page-title">Calendrier</h1>
-    <p class="page-subtitle">Les échéances des tâches et des projets.</p>
+    <p class="page-subtitle">Les rendez-vous des projets, jour par jour.</p>
   </div>
   <button type="button" class="btn btn-primary" (click)="startAdding()">+ Nouvelle tâche</button>
 </div>
-
-@if (overdue().length) {
-  <section class="card overdue" aria-labelledby="overdue-title">
-    <h2 id="overdue-title" class="overdue-title">⚠️ En retard ({{ overdue().length }})</h2>
-    <ul class="overdue-list">
-      @for (event of overdue(); track event.id) {
-        <li>
-          <span class="overdue-date">{{ event.dateLabel }}</span>
-          <a class="link" [routerLink]="event.link">{{ event.title }}</a>
-          <span class="muted">{{ event.subtitle }}</span>
-        </li>
-      }
-    </ul>
-  </section>
-}
 
 <div class="calendar-bar">
   <button type="button" class="btn btn-small" (click)="previousMonth()">
@@ -53,16 +38,19 @@
           <ul class="day-events">
             @for (event of cell.events; track event.id) {
               <li>
-                <a class="event" [class]="event.tone" [class.event-done]="event.done" [routerLink]="event.link">
+                <a class="event" [class]="event.tone" [routerLink]="event.link">
                   <span class="event-title">
                     @if (event.kind === 'project') {
                       <span aria-hidden="true">🎯</span>
                     }
+                    @if (event.full) {
+                      <span aria-hidden="true">✓</span>
+                    }
                     {{ event.title }}
                   </span>
                   <span class="event-subtitle">{{ event.subtitle }}</span>
-                  @if (event.done) {
-                    <span class="visually-hidden">(terminée)</span>
+                  @if (event.full) {
+                    <span class="visually-hidden">(complet)</span>
                   }
                 </a>
               </li>
@@ -82,6 +70,6 @@
 
 @if (adding()) {
   <app-modal title="Nouvelle tâche" (closed)="stopAdding()">
-    <app-task-form [commissions]="commissions()" [projects]="projects()" [initialDueDate]="addDate()" (done)="stopAdding()" />
+    <app-task-form [projects]="projects()" [initialDate]="addDate()" (done)="stopAdding()" />
   </app-modal>
 }

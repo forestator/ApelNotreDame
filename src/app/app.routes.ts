@@ -39,15 +39,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/calendar/calendar').then((module) => module.Calendar),
       },
       {
-        path: 'commissions',
-        loadComponent: () => import('./features/commissions/commissions').then((module) => module.Commissions),
-      },
-      {
-        path: 'commissions/:id',
-        loadComponent: () =>
-          import('./features/commission-detail/commission-detail').then((module) => module.CommissionDetail),
-      },
-      {
         path: 'membres',
         canActivate: [adminGuard],
         loadComponent: () => import('./features/members/members').then((module) => module.Members),

@@ -1,73 +1,57 @@
 <section class="hero" aria-labelledby="hero-title">
   <h1 id="hero-title" class="hero-title">Bonjour {{ member()?.displayName }} 👋</h1>
-  <p class="hero-text">Voici ce qui vous attend à l'APEL Notre-Dame.</p>
+  <p class="hero-text">Dites où vous serez : un clic sur « Je suis là » suffit.</p>
 
   <dl class="stat-grid">
     <div class="stat-tile">
-      <dt>Mes tâches en cours</dt>
-      <dd>{{ myTasks().length }}</dd>
+      <dt>Mes inscriptions à venir</dt>
+      <dd>{{ mine().length }}</dd>
     </div>
     <div class="stat-tile">
-      <dt>Coups de main</dt>
-      <dd>{{ helpTasks().length }}</dd>
-    </div>
-    <div class="stat-tile">
-      <dt>Tâches à prendre</dt>
-      <dd>{{ freeTasks().length }}</dd>
+      <dt>On a besoin de vous</dt>
+      <dd>{{ needsPeople().length }}</dd>
     </div>
     <div class="stat-tile">
       <dt>Projets</dt>
       <dd>{{ projectCount() }}</dd>
     </div>
-    <div class="stat-tile">
-      <dt>Commissions</dt>
-      <dd>{{ commissionCount() }}</dd>
-    </div>
   </dl>
 </section>
 
-<section aria-labelledby="my-tasks-title">
-  <h2 id="my-tasks-title" class="section-title">Mes tâches en cours</h2>
-  <p class="meta-line">En tant que responsable ou aidant.</p>
-  @if (myTasks().length) {
+<section aria-labelledby="mine-title">
+  <h2 id="mine-title" class="section-title">Mes prochaines inscriptions</h2>
+  @if (mine().length) {
     <ul class="card-list">
-      @for (row of myTasks(); track row.task.id) {
-        <li>
-          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
-        </li>
+      @for (task of mine(); track task.id) {
+        <li><app-task-item [task]="task" /></li>
       }
     </ul>
   } @else {
-    <p class="empty-state">Vous n'avez aucune tâche en cours. Jetez un œil aux tâches à prendre ci-dessous 👇</p>
+    <p class="empty-state">Vous n'êtes inscrit·e à rien pour l'instant. Regardez ce qu'il manque ci-dessous 👇</p>
   }
 </section>
 
-<section aria-labelledby="help-tasks-title">
-  <h2 id="help-tasks-title" class="section-title">Coups de main recherchés</h2>
-  @if (helpTasks().length) {
+<section aria-labelledby="needs-title">
+  <h2 id="needs-title" class="section-title">On a besoin de vous</h2>
+  @if (needsPeople().length) {
     <ul class="card-list">
-      @for (row of helpTasks(); track row.task.id) {
-        <li>
-          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
-        </li>
+      @for (task of needsPeople(); track task.id) {
+        <li><app-task-item [task]="task" /></li>
       }
     </ul>
   } @else {
-    <p class="empty-state">Personne n'a besoin de renfort pour le moment.</p>
+    <p class="empty-state">Tout est complet. Merci ! 🎉</p>
   }
 </section>
 
-<section aria-labelledby="free-tasks-title">
-  <h2 id="free-tasks-title" class="section-title">Tâches à prendre</h2>
-  @if (freeTasks().length) {
+@if (toSchedule().length) {
+  <section aria-labelledby="schedule-title">
+    <h2 id="schedule-title" class="section-title">À planifier</h2>
+    <p class="meta-line">Ces tâches n'ont pas encore de date.</p>
     <ul class="card-list">
-      @for (row of freeTasks(); track row.task.id) {
-        <li>
-          <app-task-item [task]="row.task" [commissionName]="row.commissionName" [projectName]="row.projectName" [canManage]="isAdmin()" />
-        </li>
+      @for (task of toSchedule(); track task.id) {
+        <li><app-task-item [task]="task" /></li>
       }
     </ul>
-  } @else {
-    <p class="empty-state">Toutes les tâches ont un responsable. Merci ! 🎉</p>
-  }
-</section>
+  </section>
+}

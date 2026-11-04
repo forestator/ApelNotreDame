@@ -4,19 +4,19 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map, switchMap } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
-import { toneClass } from '../../core/models/tone';
-import { CommissionService } from '../../core/data/commission.service';
 import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
-import { Progress } from '../../shared/progress/progress';
+import { compareByWhen, isFull } from '../../core/models/task';
+import { toneClass } from '../../core/models/tone';
 import { Modal } from '../../shared/modal/modal';
+import { Progress } from '../../shared/progress/progress';
 import { ProjectForm } from '../../shared/project-form/project-form';
 import { TaskForm } from '../../shared/task-form/task-form';
 import { TaskItem } from '../../shared/task-item/task-item';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [DatePipe, Modal, ProjectForm, Progress, RouterLink, TaskForm, TaskItem],
+  imports: [DatePipe, Modal, Progress, ProjectForm, RouterLink, TaskForm, TaskItem],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +31,6 @@ export class ProjectDetail {
   readonly id = input.required<string>();
 
   protected readonly isAdmin = this.auth.isAdmin;
-  protected readonly commissions = inject(CommissionService).commissions;
   protected readonly error = signal<string | null>(null);
   protected readonly confirmingRemoval = signal(false);
   protected readonly editing = signal(false);
@@ -50,23 +49,11 @@ export class ProjectDetail {
   );
 
   protected readonly tone = computed(() => toneClass(this.project()?.color));
-  protected readonly doneCount = computed(() => this.projectTasks().filter((task) => task.status === 'done').length);
-  protected readonly totalCount = computed(() => this.projectTasks().length);
+  protected readonly tasks = computed(() => [...this.projectTasks()].sort(compareByWhen));
 
-  // Une section par commission impliquée ; le responsable de la commission peut gérer ses tâches.
-  protected readonly groups = computed(() => {
-    const uid = this.auth.uid();
-    return this.commissions()
-      .map((commission) => ({
-        commission,
-        tone: toneClass(commission.color),
-        canManage: this.isAdmin() || commission.leadUid === uid,
-        tasks: this.projectTasks()
-          .filter((task) => task.commissionId === commission.id)
-          .sort((first, second) => Number(first.status === 'done') - Number(second.status === 'done')),
-      }))
-      .filter((group) => group.tasks.length > 0);
-  });
+  private readonly withTarget = computed(() => this.projectTasks().filter((task) => (task.needed ?? 0) > 0));
+  protected readonly doneCount = computed(() => this.withTarget().filter(isFull).length);
+  protected readonly totalCount = computed(() => this.withTarget().length);
 
   protected startAdding(): void {
     this.adding.set(true);

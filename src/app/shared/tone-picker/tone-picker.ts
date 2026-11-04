@@ -3,7 +3,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Tone, TONES } from '../../core/models/tone';
 import { uniqueId } from '../../core/utils/unique-id';
 
-/** Choix de la couleur d'une commission ou d'un projet (boutons radio, un nom par couleur). */
+/** Choix de la couleur d'un projet (boutons radio, un nom par couleur). */
 @Component({
   selector: 'app-tone-picker',
   imports: [ReactiveFormsModule],

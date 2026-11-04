@@ -50,3 +50,14 @@ export function addMonths(iso: string, months: number): string {
   const clamped = Math.min(day, daysInMonth(target.getUTCFullYear(), target.getUTCMonth()));
   return toIso(target.getUTCFullYear(), target.getUTCMonth(), clamped);
 }
+
+export function todayIso(): string {
+  const now = new Date();
+  return toIso(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+/** « 2026-11-07 » → « Samedi 7 novembre ». */
+export function longDayLabel(iso: string): string {
+  const { year, month, day } = parseIso(iso);
+  return dayLabel(year, month, day);
+}

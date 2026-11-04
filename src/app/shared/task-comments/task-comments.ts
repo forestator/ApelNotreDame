@@ -23,7 +23,7 @@ export class TaskComments {
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly taskId = input.required<string>();
-  // Admin ou responsable de la commission : peut retirer le commentaire de n'importe qui.
+  // Admin ou créateur de la tâche : peut retirer le commentaire de n'importe qui.
   readonly canModerate = input(false);
 
   protected readonly id = uniqueId('comment');

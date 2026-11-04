@@ -12,7 +12,7 @@ export const TONES = [
 
 export type Tone = (typeof TONES)[number]['key'];
 
-/** Classe CSS exposant la couleur d'une commission ou d'un projet (turquoise à défaut). */
+/** Classe CSS exposant la couleur d'un projet (turquoise à défaut). */
 export function toneClass(color?: string): string {
   return `tone-${color ?? 'teal'}`;
 }

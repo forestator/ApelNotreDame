@@ -27,7 +27,7 @@
     <div class="field">
       <label class="field-label" for="profile-name">Nom affiché</label>
       <input id="profile-name" class="field-control" type="text" formControlName="displayName" autocomplete="name" required />
-      <span class="field-hint">Ce nom apparaît sur les tâches, les aidants et la liste des membres.</span>
+      <span class="field-hint">Ce nom apparaît sur les tâches auxquelles vous êtes inscrit·e et dans la liste des membres.</span>
     </div>
     <div class="field">
       <span class="field-label">Adresse e-mail</span>
@@ -35,7 +35,7 @@
     </div>
     <label class="profile-check">
       <input type="checkbox" formControlName="emailNotifications" />
-      <span>Me prévenir par e-mail quand on m'affecte une tâche ou qu'on m'ajoute comme aidant</span>
+      <span>Me prévenir par e-mail quand quelqu'un m'inscrit à une tâche</span>
     </label>
 
     @if (message(); as text) {

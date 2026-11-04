@@ -1,4 +1,9 @@
-.admin-box {
+.project-title {
+  padding-left: 14px;
+  border-left: 8px solid var(--tone);
+}
+
+.detail-progress {
   margin: 16px 0;
 }
 
@@ -7,13 +12,5 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-}
-
-.detail-progress {
-  margin: 16px 0;
-}
-
-.project-title {
-  padding-left: 14px;
-  border-left: 8px solid var(--tone);
+  margin-top: 32px;
 }

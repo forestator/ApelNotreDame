@@ -70,41 +70,22 @@ export class MemberService {
   }
 
   /**
-   * Retire une fiche provisoire. Avec `target`, ses responsabilités (tâches, rôle d'aidant, commissions)
-   * passent au vrai compte ; sans cible, elles sont simplement libérées.
+   * Retire une fiche provisoire. Avec `target`, ses inscriptions passent au vrai compte ;
+   * sans cible, elle est simplement retirée des tâches.
    */
   async retirePlaceholder(placeholderUid: string, target?: Member): Promise<void> {
-    const tasks = collection(this.firestore, 'tasks');
     const batch = writeBatch(this.firestore);
-
-    const assigned = await getDocs(query(tasks, where('assigneeUid', '==', placeholderUid)));
-    assigned.forEach((task) =>
-      batch.update(
-        task.ref,
-        target
-          ? { assigneeUid: target.uid, assigneeName: target.displayName }
-          : { assigneeUid: null, assigneeName: null },
-      ),
+    // participants est une table uid → nom : on retrouve les tâches où la fiche figure en filtrant sur sa clé.
+    const involved = await getDocs(
+      query(collection(this.firestore, 'tasks'), where(new FieldPath('participants', placeholderUid), '>=', '')),
     );
-
-    // helpers est une table uid → nom : on retrouve les tâches où la fiche figure en filtrant sur sa clé.
-    const helped = await getDocs(query(tasks, where(new FieldPath('helpers', placeholderUid), '>=', '')));
-    helped.forEach((task) => {
-      const alreadyResponsible = task.data()['assigneeUid'] === target?.uid;
+    involved.forEach((task) => {
+      const alreadyRegistered = target ? target.uid in (task.data()['participants'] ?? {}) : false;
       batch.update(task.ref, {
-        [`helpers.${placeholderUid}`]: deleteField(),
-        ...(target && !alreadyResponsible ? { [`helpers.${target.uid}`]: target.displayName } : {}),
+        [`participants.${placeholderUid}`]: deleteField(),
+        ...(target && !alreadyRegistered ? { [`participants.${target.uid}`]: target.displayName } : {}),
       });
     });
-
-    const led = await getDocs(query(collection(this.firestore, 'commissions'), where('leadUid', '==', placeholderUid)));
-    led.forEach((commission) =>
-      batch.update(
-        commission.ref,
-        target ? { leadUid: target.uid, leadName: target.displayName } : { leadUid: null, leadName: null },
-      ),
-    );
-
     batch.delete(doc(this.firestore, `members/${placeholderUid}`));
     await batch.commit();
   }

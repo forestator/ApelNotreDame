@@ -8,7 +8,7 @@ export interface Member {
   photoURL: string | null;
   role: MemberRole;
   status: MemberStatus;
-  // Notifications par e-mail (affectation, ajout comme aidant) ; activées par défaut.
+  // Notifications par e-mail (quand quelqu'un d'autre vous inscrit à une tâche) ; activées par défaut.
   emailNotifications?: boolean;
   // Personne sans compte Google (uid « mock-… ») : un admin la remplace par le vrai compte quand il existe.
   mock?: boolean;

@@ -1,7 +1,7 @@
 <div class="page-header">
   <div>
     <h1 class="page-title">Projets</h1>
-    <p class="page-subtitle">Un projet réunit les tâches de plusieurs commissions autour d'un même objectif.</p>
+    <p class="page-subtitle">Chaque projet regroupe ses tâches : montage, stands, créneaux à pourvoir…</p>
   </div>
   @if (isAdmin()) {
     <button type="button" class="btn btn-primary" (click)="startAdding()">+ Nouveau projet</button>
@@ -19,13 +19,10 @@
           <p>{{ card.project.description }}</p>
         }
         <p class="meta-line">
-          @if (card.project.dueDate; as due) {
-            📅 Échéance : {{ due | date: 'dd/MM/yyyy' }}<br />
+          @if (card.project.dueDate; as day) {
+            📅 {{ day | date: 'dd/MM/yyyy' }}<br />
           }
-          @if (card.involved) {
-            Commissions : {{ card.involved }}<br />
-          }
-          {{ card.open }} tâche(s) ouverte(s) dont {{ card.free }} à prendre
+          {{ card.count }} tâche(s)
         </p>
         <app-progress [done]="card.done" [total]="card.total" [label]="'Avancement de ' + card.project.name" />
       </li>

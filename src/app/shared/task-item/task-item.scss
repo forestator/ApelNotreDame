@@ -4,16 +4,17 @@
   border-left: 6px solid $color-stripe-todo;
 }
 
-.task-in-progress {
+.task-open {
   border-left-color: $color-stripe-progress;
 }
 
-.task-done {
+.task-full {
   border-left-color: $color-stripe-done;
+}
 
-  .task-title {
-    text-decoration: line-through;
-  }
+.task-past {
+  border-left-color: $color-border;
+  opacity: 0.8;
 }
 
 .task-head {
@@ -26,30 +27,83 @@
 
 .task-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
+.task-when {
+  margin: 6px 0 0;
+  color: $color-primary-dark;
+  font-weight: 600;
+}
+
 .task-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
 }
 
 .task-description {
   margin: 10px 0 0;
 }
 
-.task-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 16px;
-  margin: 12px 0 0;
-  color: $color-text-muted;
+.task-people {
+  margin-top: 14px;
+}
+
+.task-count {
+  margin: 0 0 6px;
+}
+
+.task-progress {
+  margin-bottom: 10px;
+}
+
+.task-nobody {
+  margin: 0;
   font-size: 0.9rem;
 }
+
+.task-people-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 2px;
+  border: 1px solid $color-border;
+  border-radius: 999px;
+  background: $color-primary-tint;
+  font-size: 0.9rem;
+}
+
+.task-person-extra {
+  padding-left: 10px;
+  border-style: dashed;
+  background: transparent;
+}
+
+.task-person-remove {
+  min-width: 24px;
+  min-height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: $color-text;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
 .task-footer {
   display: flex;
   flex-wrap: wrap;
@@ -64,8 +118,23 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 4px 16px;
   margin-left: auto;
+}
+
+.task-link {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: $color-primary;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-accent;
+    text-decoration: underline;
+  }
 }
 
 .task-menu {
@@ -91,76 +160,4 @@
 
 .task-confirm {
   font-weight: 600;
-}
-
-.task-select-control {
-  width: auto;
-  min-height: 36px;
-  padding-block: 4px;
-  font-size: 0.9rem;
-}
-
-.task-helpers {
-  margin-top: 12px;
-  font-size: 0.9rem;
-}
-
-.task-helpers-title {
-  color: $color-text-muted;
-  font-weight: 600;
-}
-
-.task-missing {
-  color: $color-accent;
-}
-
-.task-helper-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 6px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.task-helper {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 4px 2px 2px;
-  border: 1px solid $color-border;
-  border-radius: 999px;
-  background: $color-primary-tint;
-}
-
-.task-helper-remove {
-  min-width: 24px;
-  min-height: 24px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: $color-text;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.1);
-  }
-}
-
-.task-comments-toggle {
-  margin-top: 10px;
-  padding: 6px 0;
-  border: 0;
-  background: none;
-  color: $color-primary;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    color: $color-accent;
-    text-decoration: underline;
-  }
 }

@@ -3,41 +3,74 @@
     <h3 class="form-title">Modifier la tâche</h3>
   }
   <div class="field">
-    <label class="field-label" [attr.for]="id + '-title'">Titre</label>
-    <input [id]="id + '-title'" autofocus class="field-control" type="text" formControlName="title" required />
+    <label class="field-label" [attr.for]="id + '-title'">Qu'est-ce qu'on organise ?</label>
+    <input
+      [id]="id + '-title'"
+      autofocus
+      class="field-control"
+      type="text"
+      formControlName="title"
+      placeholder="Ex. Montage du chapiteau"
+      required
+    />
   </div>
-  <div class="field">
-    <label class="field-label" [attr.for]="id + '-description'">Description</label>
-    <textarea [id]="id + '-description'" class="field-control" rows="3" formControlName="description"></textarea>
-  </div>
-  @if (showCommission()) {
-    <div class="field">
-      <label class="field-label" [attr.for]="id + '-commission'">Commission responsable</label>
-      <select [id]="id + '-commission'" class="field-control select-toned" [class]="commissionTone()" formControlName="commissionId" required>
-        <option value="">Choisir…</option>
-        @for (option of commissionOptions(); track option.id) {
-          <option [value]="option.id" class="select-option" [class]="option.tone">{{ option.name }}</option>
-        }
-      </select>
-    </div>
-  }
+
   @if (showProject()) {
     <div class="field">
-      <label class="field-label" [attr.for]="id + '-project'">Projet (facultatif)</label>
-      <select [id]="id + '-project'" class="field-control select-toned" [class]="projectTone()" formControlName="projectId">
-        <option value="">Aucun projet</option>
+      <label class="field-label" [attr.for]="id + '-project'">Projet</label>
+      <select
+        [id]="id + '-project'"
+        class="field-control select-toned"
+        [class]="projectTone()"
+        formControlName="projectId"
+        required
+      >
+        <option value="">Choisir…</option>
         @for (option of projectOptions(); track option.id) {
           <option [value]="option.id" class="select-option" [class]="option.tone">{{ option.name }}</option>
         }
       </select>
     </div>
   }
-  <app-date-field [control]="form.controls.dueDate" label="Échéance (facultatif)" />
-  <div class="field">
-    <label class="field-label" [attr.for]="id + '-helpers'">Aidants souhaités (facultatif)</label>
-    <input [id]="id + '-helpers'" class="field-control" type="number" min="0" max="50" formControlName="helpersNeeded" />
-    <span class="field-hint">Pour les tâches à plusieurs, comme le montage : en plus du responsable.</span>
+
+  <div class="form-row">
+    <app-date-field [control]="form.controls.date" label="Jour" />
+    <div class="field">
+      <label class="field-label" [attr.for]="id + '-time'">Heure</label>
+      <input
+        [id]="id + '-time'"
+        class="field-control"
+        type="text"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="9h30"
+        [attr.aria-describedby]="id + '-time-hint'"
+        formControlName="time"
+      />
+      <span [id]="id + '-time-hint'" class="field-hint" [class.field-hint-error]="timeInvalid()">
+        {{ timeInvalid() ? 'Heure invalide : essayez 9h30 ou 14:00.' : 'Ex. 9h30 ou 17:00' }}
+      </span>
+    </div>
   </div>
+
+  <div class="form-row">
+    <div class="field">
+      <label class="field-label" [attr.for]="id + '-needed'">Combien de personnes ?</label>
+      <input [id]="id + '-needed'" class="field-control" type="number" min="0" max="200" formControlName="needed" />
+      <span class="field-hint">0 si on ne fixe pas de nombre.</span>
+    </div>
+    <div class="field">
+      <label class="field-label" [attr.for]="id + '-extra'">Déjà prévus hors application</label>
+      <input [id]="id + '-extra'" class="field-control" type="number" min="0" max="200" formControlName="extraPeople" />
+      <span class="field-hint">Comptés dans l'effectif.</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-description'">Détails (facultatif)</label>
+    <textarea [id]="id + '-description'" class="field-control" rows="2" formControlName="description"></textarea>
+  </div>
+
   @if (error(); as message) {
     <p class="error-message" role="alert">{{ message }}</p>
   }
