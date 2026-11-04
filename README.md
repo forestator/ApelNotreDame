@@ -74,21 +74,6 @@ après remplacement serait recréée). `--replace-tasks` supprime toutes les tâ
 d'autre que l'admin en a créé). Il lit une clé de compte de service dans `~/.config/apel/service-account.json`
 (Console Firebase > Paramètres > Comptes de service). **Cette clé contourne les règles : ne jamais la versionner.**
 
-## Notifications par e-mail (EmailJS)
-
-Les e-mails partent du navigateur de la personne qui inscrit quelqu'un d'autre, via [EmailJS](https://www.emailjs.com) : pas de serveur,
-pas de forfait Firebase payant. Un e-mail est envoyé quand un admin ou le créateur d'une tâche **inscrit quelqu'un d'autre**
-(jamais pour sa propre inscription), et seulement si le destinataire n'a pas désactivé l'option dans *Mon profil*.
-
-1. Créer un compte EmailJS, puis **Email Services** > connecter une boîte d'envoi (Gmail, etc.) → `serviceId`.
-2. **Email Templates** > nouveau modèle, champ *To email* : `{{to_email}}`. Paramètres disponibles :
-   `to_name`, `from_name`, `task_title`, `task_when`, `project_name`, `task_description`, `task_url`.
-3. **Account** > clé publique → `publicKey`. Dans *Security*, limiter les domaines autorisés (localhost, domaine Hosting).
-4. Renseigner `emailjs` dans `src/environments/environment.ts`.
-
-Limites : le plan gratuit est plafonné (200 e-mails/mois) ; un e-mail ne part que si quelqu'un agit dans l'application
-(pas de rappels automatiques d'échéance, qui demanderaient un serveur).
-
 ## Personnes sans compte
 
 Une fiche « sans compte » (`mock-…`) permet d'inscrire à une tâche quelqu'un qui n'a pas encore créé son compte Google.

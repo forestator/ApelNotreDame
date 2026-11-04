@@ -30,18 +30,6 @@
   outline-offset: 2px;
 }
 
-.profile-check {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-
-  input {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-  }
-}
-
 .profile-success {
   margin: 0;
   color: $color-done-text;

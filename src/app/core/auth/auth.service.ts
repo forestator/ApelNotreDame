@@ -90,7 +90,7 @@ export class AuthService {
   }
 
   /** Un membre ne peut modifier que son nom, sa photo et ses préférences (cf. firestore.rules). */
-  updateProfile(changes: Partial<Pick<Member, 'displayName' | 'photoURL' | 'emailNotifications'>>): Promise<void> {
+  updateProfile(changes: Partial<Pick<Member, 'displayName' | 'photoURL'>>): Promise<void> {
     const uid = this.uid();
     return uid ? updateDoc(doc(this.firestore, `members/${uid}`), changes) : Promise.resolve();
   }
@@ -115,7 +115,6 @@ export class AuthService {
       photoURL: user.photoURL,
       role: 'member',
       status: 'pending',
-      emailNotifications: true,
     };
     await setDoc(ref, member);
   }

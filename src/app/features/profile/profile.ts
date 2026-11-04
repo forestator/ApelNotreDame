@@ -22,24 +22,20 @@ export class Profile {
 
   protected readonly form = this.formBuilder.group({
     displayName: ['', [Validators.required, Validators.maxLength(60)]],
-    emailNotifications: [true],
   });
 
   constructor() {
     // La route est protégée par le guard : la fiche membre est déjà chargée.
     const member = this.member();
     if (member) {
-      this.form.setValue({
-        displayName: member.displayName,
-        emailNotifications: member.emailNotifications ?? true,
-      });
+      this.form.setValue({ displayName: member.displayName });
     }
   }
 
   protected async save(): Promise<void> {
     if (this.form.invalid) return;
-    const { displayName, emailNotifications } = this.form.getRawValue();
-    await this.run(() => this.auth.updateProfile({ displayName: displayName.trim(), emailNotifications }), 'Profil enregistré.');
+    const { displayName } = this.form.getRawValue();
+    await this.run(() => this.auth.updateProfile({ displayName: displayName.trim() }), 'Profil enregistré.');
   }
 
   protected async choosePhoto(files: FileList | null): Promise<void> {

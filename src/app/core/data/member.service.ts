@@ -67,7 +67,6 @@ export class MemberService {
       photoURL: null,
       role: 'member',
       status: 'approved',
-      emailNotifications: false,
       mock: true,
     };
     await setDoc(doc(this.firestore, `members/${uid}`), placeholder);

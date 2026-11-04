@@ -40,7 +40,7 @@ if (process.argv.includes('--placeholders')) {
     if ((await ref.get()).exists) continue;
     console.log(`  + fiche sans compte : ${name}`);
     if (!dryRun) {
-      await ref.set({ uid: ref.id, displayName: name, email: '', photoURL: null, role: 'member', status: 'approved', emailNotifications: false, mock: true });
+      await ref.set({ uid: ref.id, displayName: name, email: '', photoURL: null, role: 'member', status: 'approved', mock: true });
     }
   }
 }

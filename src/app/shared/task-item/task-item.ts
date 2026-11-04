@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { MemberService } from '../../core/data/member.service';
-import { NotificationService } from '../../core/data/notification.service';
 import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
 import { headcount, isFull, missingPeople, Task } from '../../core/models/task';
@@ -25,7 +24,6 @@ export class TaskItem {
   private readonly auth = inject(AuthService);
   private readonly taskService = inject(TaskService);
   private readonly memberService = inject(MemberService);
-  private readonly notifications = inject(NotificationService);
   private readonly today = todayIso();
 
   readonly task = input.required<Task>();
@@ -110,7 +108,6 @@ export class TaskItem {
     const member = this.addable().find((candidate) => candidate.uid === uid);
     if (!member) return;
     await this.attempt(() => this.taskService.register(this.task().id, member));
-    await this.notifications.notifyRegistered(member, this.task(), this.projectName());
   }
 
   protected removePerson(uid: string): Promise<void> {

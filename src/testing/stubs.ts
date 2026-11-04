@@ -3,7 +3,6 @@ import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { AuthService } from '../app/core/auth/auth.service';
 import { MemberService } from '../app/core/data/member.service';
-import { NotificationService } from '../app/core/data/notification.service';
 import { ProjectService } from '../app/core/data/project.service';
 import { TaskService } from '../app/core/data/task.service';
 import { Member } from '../app/core/models/member';
@@ -75,18 +74,15 @@ export function appStubs(options: { tasks?: Task[]; projects?: Project[]; member
     pending: computed(() => []),
     profiles: computed(() => new Map(members.map((member) => [member.uid, member]))),
   };
-  const notifications = { notifyRegistered: vi.fn().mockResolvedValue(undefined) };
 
   return {
     auth,
     taskService,
-    notifications,
     providers: [
       { provide: AuthService, useValue: auth },
       { provide: TaskService, useValue: taskService },
       { provide: ProjectService, useValue: projectService },
       { provide: MemberService, useValue: memberService },
-      { provide: NotificationService, useValue: notifications },
     ],
   };
 }

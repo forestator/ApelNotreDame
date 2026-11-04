@@ -33,10 +33,6 @@
       <span class="field-label">Adresse e-mail</span>
       <span class="muted">{{ current.email }} (compte Google)</span>
     </div>
-    <label class="profile-check">
-      <input type="checkbox" formControlName="emailNotifications" />
-      <span>Me prévenir par e-mail quand quelqu'un m'inscrit à une tâche</span>
-    </label>
 
     @if (message(); as text) {
       <p role="status" class="profile-success">{{ text }}</p>
