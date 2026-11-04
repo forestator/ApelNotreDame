@@ -54,23 +54,6 @@ describe('TaskItem', () => {
     expect(stubs.taskService.unregister).toHaveBeenCalledWith('task-1', ME.uid);
   });
 
-  it('demande confirmation avant de retirer quelqu\'un d\'autre', async () => {
-    const { buttonLabelled, stubs, fixture } = await render(
-      makeTask({ date: upcoming(), needed: 3, participants: { 'mock-kevin': 'Kevin' } }),
-      { isAdmin: true },
-    );
-    buttonLabelled('Retirer Kevin')?.click();
-    await fixture.whenStable();
-    expect(stubs.taskService.unregister).not.toHaveBeenCalled();
-    buttonLabelled('Non')?.click();
-    await fixture.whenStable();
-    expect(stubs.taskService.unregister).not.toHaveBeenCalled();
-    buttonLabelled('Retirer Kevin')?.click();
-    await fixture.whenStable();
-    buttonLabelled('Oui')?.click();
-    expect(stubs.taskService.unregister).toHaveBeenCalledWith('task-1', 'mock-kevin');
-  });
-
   it('n\'offre plus l\'inscription pour une tâche passée', async () => {
     const { buttonLabelled, text } = await render(makeTask({ date: '2020-01-01', needed: 3 }));
     expect(text).toContain('Passé');

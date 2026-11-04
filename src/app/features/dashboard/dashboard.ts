@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
-import { compareByWhen, missingPeople } from '../../core/models/task';
+import { compareByWhen, missingPeople, Task } from '../../core/models/task';
 import { todayIso } from '../../core/utils/calendar-math';
 import { Loader } from '../../shared/loader/loader';
 import { TaskItem } from '../../shared/task-item/task-item';
@@ -36,14 +36,34 @@ export class Dashboard {
     return uid !== null && uid in (participants ?? {});
   };
 
-  protected readonly mine = computed(() =>
-    this.upcoming().filter((task) => this.isRegistered(task.participants)),
-  );
+  private readonly registeredNow = computed(() => this.upcoming().filter((task) => this.isRegistered(task.participants)));
 
   // Ce qui manque de monde et où je ne suis pas encore inscrit·e.
-  protected readonly needsPeople = computed(() =>
+  private readonly missingNow = computed(() =>
     this.upcoming().filter((task) => missingPeople(task) > 0 && !this.isRegistered(task.participants)),
   );
+
+  protected readonly mineCount = computed(() => this.registeredNow().length);
+  protected readonly needsCount = computed(() => this.missingNow().length);
+
+  // Une tâche sur laquelle on vient de cliquer reste dans sa section jusqu'au prochain chargement :
+  // la voir sauter dans une autre liste désoriente.
+  private readonly pinned = signal<Record<string, 'mine' | 'needs'>>({});
+
+  protected readonly mine = computed(() => this.inSection('mine', this.registeredNow()));
+  protected readonly needsPeople = computed(() => this.inSection('needs', this.missingNow()));
+
+  protected pin(task: Task, section: 'mine' | 'needs'): void {
+    this.pinned.update((current) => (task.id in current ? current : { ...current, [task.id]: section }));
+  }
+
+  private inSection(section: 'mine' | 'needs', natural: Task[]): Task[] {
+    const pinned = this.pinned();
+    const naturalIds = new Set(natural.map((task) => task.id));
+    return this.upcoming().filter((task) =>
+      task.id in pinned ? pinned[task.id] === section : naturalIds.has(task.id),
+    );
+  }
 
   protected readonly toSchedule = computed(() =>
     this.taskService

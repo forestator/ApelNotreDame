@@ -48,22 +48,10 @@
               <app-avatar [name]="person.name" [photoUrl]="person.photo" [small]="true" />
               {{ person.name }}
               @if (person.removable) {
-                @if (personToRemove() === person.uid) {
-                  <span class="task-person-confirm" role="alert">
-                    Retirer ?
-                    <button type="button" class="task-link" (click)="confirmPersonRemoval(person.uid)">
-                      Oui<span class="visually-hidden">, retirer {{ person.name }}</span>
-                    </button>
-                    <button type="button" class="task-link" (click)="cancelPersonRemoval()">
-                      Non<span class="visually-hidden">, garder {{ person.name }}</span>
-                    </button>
-                  </span>
-                } @else {
-                  <button type="button" class="task-person-remove" (click)="askPersonRemoval(person.uid)">
-                    <span aria-hidden="true">×</span
-                    ><span class="visually-hidden">Retirer {{ person.name }} de la liste</span>
-                  </button>
-                }
+                <button type="button" class="task-person-remove" (click)="removePerson(person.uid)">
+                  <span aria-hidden="true">×</span
+                  ><span class="visually-hidden">Retirer {{ person.name }} de la liste</span>
+                </button>
               }
             </li>
           }

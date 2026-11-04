@@ -7,11 +7,11 @@
     <dl class="stat-grid">
       <div class="stat-tile">
         <dt>Mes inscriptions à venir</dt>
-        <dd>{{ mine().length }}</dd>
+        <dd>{{ mineCount() }}</dd>
       </div>
       <div class="stat-tile">
         <dt>On a besoin de vous</dt>
-        <dd>{{ needsPeople().length }}</dd>
+        <dd>{{ needsCount() }}</dd>
       </div>
       <div class="stat-tile">
         <dt>Projets</dt>
@@ -29,7 +29,7 @@
     @if (mine().length) {
       <ul class="card-list">
         @for (task of mine(); track task.id) {
-          <li><app-task-item [task]="task" /></li>
+          <li><app-task-item [task]="task" (registrationToggled)="pin(task, 'mine')" /></li>
         }
       </ul>
     } @else {
@@ -42,7 +42,7 @@
     @if (needsPeople().length) {
       <ul class="card-list">
         @for (task of needsPeople(); track task.id) {
-          <li><app-task-item [task]="task" /></li>
+          <li><app-task-item [task]="task" (registrationToggled)="pin(task, 'needs')" /></li>
         }
       </ul>
     } @else {

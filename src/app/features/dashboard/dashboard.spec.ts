@@ -11,7 +11,7 @@ async function render(tasks = [] as ReturnType<typeof makeTask>[], loaded = true
   const fixture = TestBed.createComponent(Dashboard);
   await fixture.whenStable();
   const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-  return { fixture, text, element: fixture.nativeElement as HTMLElement };
+  return { fixture, text, stubs, element: fixture.nativeElement as HTMLElement };
 }
 
 describe('Dashboard', () => {
@@ -51,5 +51,20 @@ describe('Dashboard', () => {
     expect(element.querySelector('[role="status"]')?.textContent).toContain('Chargement');
     expect(text).not.toContain('Vous n\'êtes inscrit·e à rien');
     expect(element.querySelector('.stat-grid')).toBeNull();
+  });
+
+  it('garde la carte dans sa section après un clic, tout en mettant le compteur à jour', async () => {
+    const task = makeTask({ id: 'a', title: 'Besoin de monde', date: addDays(todayIso(), 3), needed: 4 });
+    const { fixture, element, stubs } = await render([task]);
+    const section = (headingId: string) =>
+      element.querySelector(`section[aria-labelledby="${headingId}"]`)?.textContent ?? '';
+
+    Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.includes('Je suis là'))?.click();
+    stubs.taskService.tasks.set([{ ...task, participants: { me: 'Maximilien' } }]);
+    await fixture.whenStable();
+
+    expect(section('needs-title')).toContain('Besoin de monde');
+    expect(section('mine-title')).not.toContain('Besoin de monde');
+    expect(element.querySelector('.stat-tile dd')?.textContent?.trim()).toBe('1');
   });
 });

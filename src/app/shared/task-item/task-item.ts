@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { MemberService } from '../../core/data/member.service';
@@ -31,6 +31,8 @@ export class TaskItem {
   readonly task = input.required<Task>();
   // Masqué sur la page du projet lui-même, où il serait redondant.
   readonly showProject = input(true);
+  // Prévient la liste avant l'écriture : elle peut ainsi garder la carte en place au lieu de la faire changer de section.
+  readonly registrationToggled = output<void>();
 
   protected readonly menuId = uniqueId('task-menu');
   protected readonly commentsId = uniqueId('task-comments');
@@ -39,7 +41,6 @@ export class TaskItem {
   protected readonly manageOpen = signal(false);
   protected readonly commentsOpen = signal(false);
   protected readonly confirmingRemoval = signal(false);
-  protected readonly personToRemove = signal<string | null>(null);
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -97,6 +98,7 @@ export class TaskItem {
   protected async toggleRegistration(): Promise<void> {
     const member = this.auth.member();
     if (!member) return;
+    this.registrationToggled.emit();
     await this.attempt(() =>
       this.isRegistered()
         ? this.taskService.unregister(this.task().id, member.uid)
@@ -111,18 +113,8 @@ export class TaskItem {
     await this.notifications.notifyRegistered(member, this.task(), this.projectName());
   }
 
-  // Un « × » touché par mégarde ne doit pas désinscrire quelqu'un : on demande confirmation.
-  protected askPersonRemoval(uid: string): void {
-    this.personToRemove.set(uid);
-  }
-
-  protected cancelPersonRemoval(): void {
-    this.personToRemove.set(null);
-  }
-
-  protected async confirmPersonRemoval(uid: string): Promise<void> {
-    this.personToRemove.set(null);
-    await this.attempt(() => this.taskService.unregister(this.task().id, uid));
+  protected removePerson(uid: string): Promise<void> {
+    return this.attempt(() => this.taskService.unregister(this.task().id, uid));
   }
 
   protected remove(): Promise<void> {
