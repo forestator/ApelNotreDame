@@ -4,11 +4,12 @@ import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
 import { compareByWhen, missingPeople } from '../../core/models/task';
 import { todayIso } from '../../core/utils/calendar-math';
+import { Loader } from '../../shared/loader/loader';
 import { TaskItem } from '../../shared/task-item/task-item';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [TaskItem],
+  imports: [Loader, TaskItem],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,7 +20,9 @@ export class Dashboard {
   private readonly today = todayIso();
 
   protected readonly member = this.auth.member;
-  protected readonly projectCount = computed(() => inject(ProjectService).projects().length);
+  private readonly projectService = inject(ProjectService);
+  protected readonly loading = computed(() => !this.taskService.loaded() || !this.projectService.loaded());
+  protected readonly projectCount = computed(() => this.projectService.projects().length);
 
   private readonly upcoming = computed(() =>
     this.taskService

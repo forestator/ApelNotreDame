@@ -25,7 +25,9 @@
       <h2 id="tasks-title" class="section-title">Tâches</h2>
       <button type="button" class="btn btn-primary btn-small" (click)="startAdding()">+ Nouvelle tâche</button>
     </div>
-    @if (tasks().length) {
+    @if (!tasksLoaded()) {
+      <app-loader label="Chargement des tâches…" />
+    } @else if (tasks().length) {
       <ul class="card-list">
         @for (task of tasks(); track task.id) {
           <li><app-task-item [task]="task" [showProject]="false" /></li>
@@ -58,4 +60,6 @@
   }
 } @else if (project() === null) {
   <p class="empty-state">Projet introuvable.</p>
+} @else {
+  <app-loader label="Chargement du projet…" />
 }

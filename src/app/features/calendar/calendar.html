@@ -6,6 +6,10 @@
   <button type="button" class="btn btn-primary" (click)="startAdding()">+ Nouvelle tâche</button>
 </div>
 
+@if (loading()) {
+  <app-loader label="Chargement du calendrier…" />
+}
+
 <div class="calendar-bar">
   <button type="button" class="btn btn-small" (click)="previousMonth()">
     <span aria-hidden="true">‹</span><span class="visually-hidden">Mois précédent</span>
@@ -64,7 +68,7 @@
   }
 </ol>
 
-@if (!monthEventCount()) {
+@if (!loading() && !monthEventCount()) {
   <p class="empty-state calendar-empty">Aucune échéance ce mois-ci.</p>
 }
 

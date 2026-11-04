@@ -8,6 +8,7 @@ import { ProjectService } from '../../core/data/project.service';
 import { TaskService } from '../../core/data/task.service';
 import { compareByWhen, isFull } from '../../core/models/task';
 import { toneClass } from '../../core/models/tone';
+import { Loader } from '../../shared/loader/loader';
 import { Modal } from '../../shared/modal/modal';
 import { Progress } from '../../shared/progress/progress';
 import { ProjectForm } from '../../shared/project-form/project-form';
@@ -16,7 +17,7 @@ import { TaskItem } from '../../shared/task-item/task-item';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [DatePipe, Modal, Progress, ProjectForm, RouterLink, TaskForm, TaskItem],
+  imports: [DatePipe, Loader, Modal, Progress, ProjectForm, RouterLink, TaskForm, TaskItem],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,15 +44,14 @@ export class ProjectDetail {
       map((project) => project ?? null),
     ),
   );
-  private readonly projectTasks = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.taskService.forProject$(id))),
-    { initialValue: [] },
-  );
+  // undefined tant que la première réponse n'est pas arrivée (on affiche alors un loader).
+  private readonly projectTasks = toSignal(toObservable(this.id).pipe(switchMap((id) => this.taskService.forProject$(id))));
+  protected readonly tasksLoaded = computed(() => this.projectTasks() !== undefined);
 
   protected readonly tone = computed(() => toneClass(this.project()?.color));
-  protected readonly tasks = computed(() => [...this.projectTasks()].sort(compareByWhen));
+  protected readonly tasks = computed(() => [...(this.projectTasks() ?? [])].sort(compareByWhen));
 
-  private readonly withTarget = computed(() => this.projectTasks().filter((task) => (task.needed ?? 0) > 0));
+  private readonly withTarget = computed(() => (this.projectTasks() ?? []).filter((task) => (task.needed ?? 0) > 0));
   protected readonly doneCount = computed(() => this.withTarget().filter(isFull).length);
   protected readonly totalCount = computed(() => this.withTarget().length);
 

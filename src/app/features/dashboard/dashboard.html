@@ -1,57 +1,64 @@
 <section class="hero" aria-labelledby="hero-title">
+  <p class="hero-eyebrow">Accueil</p>
   <h1 id="hero-title" class="hero-title">Bonjour {{ member()?.displayName }} 👋</h1>
   <p class="hero-text">Dites où vous serez : un clic sur « Je suis là » suffit.</p>
 
-  <dl class="stat-grid">
-    <div class="stat-tile">
-      <dt>Mes inscriptions à venir</dt>
-      <dd>{{ mine().length }}</dd>
-    </div>
-    <div class="stat-tile">
-      <dt>On a besoin de vous</dt>
-      <dd>{{ needsPeople().length }}</dd>
-    </div>
-    <div class="stat-tile">
-      <dt>Projets</dt>
-      <dd>{{ projectCount() }}</dd>
-    </div>
-  </dl>
-</section>
-
-<section aria-labelledby="mine-title">
-  <h2 id="mine-title" class="section-title">Mes prochaines inscriptions</h2>
-  @if (mine().length) {
-    <ul class="card-list">
-      @for (task of mine(); track task.id) {
-        <li><app-task-item [task]="task" /></li>
-      }
-    </ul>
-  } @else {
-    <p class="empty-state">Vous n'êtes inscrit·e à rien pour l'instant. Regardez ce qu'il manque ci-dessous 👇</p>
+  @if (!loading()) {
+    <dl class="stat-grid">
+      <div class="stat-tile">
+        <dt>Mes inscriptions à venir</dt>
+        <dd>{{ mine().length }}</dd>
+      </div>
+      <div class="stat-tile">
+        <dt>On a besoin de vous</dt>
+        <dd>{{ needsPeople().length }}</dd>
+      </div>
+      <div class="stat-tile">
+        <dt>Projets</dt>
+        <dd>{{ projectCount() }}</dd>
+      </div>
+    </dl>
   }
 </section>
 
-<section aria-labelledby="needs-title">
-  <h2 id="needs-title" class="section-title">On a besoin de vous</h2>
-  @if (needsPeople().length) {
-    <ul class="card-list">
-      @for (task of needsPeople(); track task.id) {
-        <li><app-task-item [task]="task" /></li>
-      }
-    </ul>
-  } @else {
-    <p class="empty-state">Tout est complet. Merci ! 🎉</p>
-  }
-</section>
-
-@if (toSchedule().length) {
-  <section aria-labelledby="schedule-title">
-    <h2 id="schedule-title" class="section-title">À planifier</h2>
-    <p class="meta-line">Ces tâches n'ont pas encore de date.</p>
-    <ul class="card-list">
-      @for (task of toSchedule(); track task.id) {
-        <li><app-task-item [task]="task" /></li>
-      }
-    </ul>
+@if (loading()) {
+  <app-loader label="Chargement de vos tâches…" />
+} @else {
+  <section aria-labelledby="mine-title">
+    <h2 id="mine-title" class="section-title">Mes prochaines inscriptions</h2>
+    @if (mine().length) {
+      <ul class="card-list">
+        @for (task of mine(); track task.id) {
+          <li><app-task-item [task]="task" /></li>
+        }
+      </ul>
+    } @else {
+      <p class="empty-state">Vous n'êtes inscrit·e à rien pour l'instant. Regardez ce qu'il manque ci-dessous 👇</p>
+    }
   </section>
+
+  <section aria-labelledby="needs-title">
+    <h2 id="needs-title" class="section-title">On a besoin de vous</h2>
+    @if (needsPeople().length) {
+      <ul class="card-list">
+        @for (task of needsPeople(); track task.id) {
+          <li><app-task-item [task]="task" /></li>
+        }
+      </ul>
+    } @else {
+      <p class="empty-state">Tout est complet. Merci ! 🎉</p>
+    }
+  </section>
+
+  @if (toSchedule().length) {
+    <section aria-labelledby="schedule-title">
+      <h2 id="schedule-title" class="section-title">À planifier</h2>
+      <p class="meta-line">Ces tâches n'ont pas encore de date.</p>
+      <ul class="card-list">
+        @for (task of toSchedule(); track task.id) {
+          <li><app-task-item [task]="task" /></li>
+        }
+      </ul>
+    </section>
+  }
 }

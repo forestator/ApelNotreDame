@@ -8,7 +8,9 @@
   }
 </div>
 
-@if (cards().length) {
+@if (loading()) {
+  <app-loader label="Chargement des projets…" />
+} @else if (cards().length) {
   <ul class="card-grid">
     @for (card of cards(); track card.project.id) {
       <li class="card card-interactive" [class]="card.tone">

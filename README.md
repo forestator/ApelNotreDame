@@ -43,6 +43,16 @@ Firestore, modifier ce document : `status = "approved"` et `role = "admin"`. Les
 > Les commissions ont été retirées de l'application (idée mise de côté). Les anciens documents `commissions/*` restent en base,
 > inutilisés ; ils peuvent être supprimés depuis la console Firebase.
 
+## Tests
+
+```bash
+npm test -- --watch=false
+```
+
+Les tests affichent les vrais composants avec de faux services (`src/testing/`) : ils vérifient l'état de connexion juste après
+le login, l'accueil, la carte de tâche (inscription, erreurs visibles, droits), le calendrier et les loaders. Les règles
+Firestore ne sont pas couvertes par ces tests : elles se vérifient contre la base avec un jeton de test (voir l'historique).
+
 ## Déploiement
 
 ```bash

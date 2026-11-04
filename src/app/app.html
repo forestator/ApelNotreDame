@@ -1,1 +1,11 @@
+@if (navigating()) {
+  <div class="route-progress" role="progressbar" aria-label="Chargement de la page"></div>
+}
+
+@if (resolvingSession()) {
+  <div class="session-loading">
+    <app-loader label="Chargement de l'application…" />
+  </div>
+}
+
 <router-outlet />

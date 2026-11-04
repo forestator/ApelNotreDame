@@ -74,7 +74,9 @@
 
 .nav-link-active {
   background: #ffffff;
+  box-shadow: inset 0 -4px 0 $color-brand-magenta;
   color: $color-primary-dark;
+  font-weight: 800;
 
   &:hover {
     background: #ffffff;

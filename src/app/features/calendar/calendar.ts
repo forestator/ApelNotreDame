@@ -13,6 +13,7 @@ import {
   WEEKDAYS,
 } from '../../core/utils/calendar-math';
 import { formatTime } from '../../core/utils/french-time';
+import { Loader } from '../../shared/loader/loader';
 import { Modal } from '../../shared/modal/modal';
 import { TaskForm } from '../../shared/task-form/task-form';
 
@@ -30,7 +31,7 @@ interface CalendarEvent {
 
 @Component({
   selector: 'app-calendar',
-  imports: [Modal, RouterLink, TaskForm],
+  imports: [Loader, Modal, RouterLink, TaskForm],
   templateUrl: './calendar.html',
   styleUrl: './calendar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +44,7 @@ export class Calendar {
   protected readonly todayIso = toIso(this.now.getFullYear(), this.now.getMonth(), this.now.getDate());
   protected readonly weekdays = WEEKDAYS;
   protected readonly projects = this.projectService.projects;
+  protected readonly loading = computed(() => !this.taskService.loaded() || !this.projectService.loaded());
 
   protected readonly adding = signal(false);
   // Jour cliqué (aaaa-mm-jj) : devient la date préremplie de la nouvelle tâche.

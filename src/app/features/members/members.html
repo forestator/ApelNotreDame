@@ -1,5 +1,9 @@
 <h1 class="page-title">Membres</h1>
 
+@if (!loaded()) {
+  <app-loader label="Chargement des membres…" />
+} @else {
+
 <section aria-labelledby="pending-title">
   <h2 id="pending-title" class="section-title">Demandes en attente</h2>
   @if (pending().length) {
@@ -153,3 +157,4 @@
     </div>
   </form>
 </section>
+}

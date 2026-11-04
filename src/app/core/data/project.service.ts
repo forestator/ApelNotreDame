@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   addDoc,
@@ -14,7 +14,7 @@ import {
   where,
   writeBatch,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NewProject, Project } from '../models/project';
 
@@ -24,9 +24,14 @@ export class ProjectService {
   private readonly auth = inject(AuthService);
   private readonly collectionRef = collection(this.firestore, 'projects');
 
+  readonly loaded = signal(false);
+
   readonly projects = toSignal(
     this.auth.whenApproved(
-      () => collectionData(query(this.collectionRef, orderBy('name')), { idField: 'id' }) as Observable<Project[]>,
+      () =>
+        (collectionData(query(this.collectionRef, orderBy('name')), { idField: 'id' }) as Observable<Project[]>).pipe(
+          tap(() => this.loaded.set(true)),
+        ),
       [],
     ),
     { initialValue: [] },

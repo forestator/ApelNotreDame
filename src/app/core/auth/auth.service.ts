@@ -1,8 +1,8 @@
-import { computed, inject, Injectable, Injector, runInInjectionContext } from '@angular/core';
+import { computed, effect, inject, Injectable, Injector, runInInjectionContext } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Auth, authState, GoogleAuthProvider, signInWithPopup, signOut } from '@angular/fire/auth';
 import { doc, docData, Firestore, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
-import { distinctUntilChanged, filter, map, Observable, of, switchMap, take } from 'rxjs';
+import { distinctUntilChanged, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { Member } from '../models/member';
 
 // 'unregistered' : connecté à Google mais sans fiche membre (refusé par un admin, ou création échouée).
@@ -24,6 +24,9 @@ export class AuthService {
         user
           ? (docData(doc(this.firestore, `members/${user.uid}`)) as Observable<Member | undefined>).pipe(
               map((member) => member ?? null),
+              // À chaque changement d'utilisateur, on repasse en « chargement » : sans cela, l'ancienne valeur
+              // (null quand on était déconnecté) ferait croire à un compte sans fiche et renverrait vers la connexion.
+              startWith(undefined),
             )
           : of(null),
       ),
@@ -38,9 +41,7 @@ export class AuthService {
     return member === null ? 'unregistered' : member.status;
   });
 
-  private readonly status$ = toObservable(this.status);
-
-  private readonly approved$ = this.status$.pipe(
+  private readonly approved$ = toObservable(this.status).pipe(
     map((status) => status === 'approved'),
     distinctUntilChanged(),
   );
@@ -54,12 +55,23 @@ export class AuthService {
 
   readonly uid = computed(() => this.firebaseUser()?.uid ?? null);
 
-  /** Émet une seule fois, dès que le statut n'est plus 'loading'. */
+  /**
+   * Émet une seule fois, dès que le statut n'est plus 'loading'.
+   * Lit le statut au moment où l'effet s'exécute (et non une valeur mémorisée) : un guard ne voit jamais un état périmé.
+   */
   whenResolved(): Observable<AuthStatus> {
-    return this.status$.pipe(
-      filter((status) => status !== 'loading'),
-      take(1),
-    );
+    return new Observable<AuthStatus>((subscriber) => {
+      const watcher = effect(
+        () => {
+          const status = this.status();
+          if (status === 'loading') return;
+          subscriber.next(status);
+          subscriber.complete();
+        },
+        { injector: this.injector },
+      );
+      return () => watcher.destroy();
+    });
   }
 
   /**

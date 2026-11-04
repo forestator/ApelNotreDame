@@ -5,8 +5,13 @@
     <p class="muted">Dites où vous serez : montages, stands, créneaux à pourvoir.</p>
 
     <button type="button" class="btn btn-primary" [disabled]="busy()" (click)="signIn()">
-      Se connecter avec Google
+      {{ busy() ? 'Connexion en cours…' : 'Se connecter avec Google' }}
     </button>
+    @if (busy()) {
+      <p class="muted login-hint" role="status">
+        Une fenêtre Google s'ouvre. Terminez la connexion dans cette fenêtre, puis patientez un instant.
+      </p>
+    }
 
     @if (error(); as message) {
       <p class="error-message" role="alert">{{ message }}</p>

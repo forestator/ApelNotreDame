@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   collection,
@@ -16,7 +16,7 @@ import {
   where,
   writeBatch,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Member, MemberRole } from '../models/member';
 
@@ -25,10 +25,14 @@ export class MemberService {
   private readonly firestore = inject(Firestore);
   private readonly auth = inject(AuthService);
 
+  readonly loaded = signal(false);
+
   readonly members = toSignal(
     this.auth.whenApproved(
       () =>
-        collectionData(query(collection(this.firestore, 'members'), orderBy('displayName'))) as Observable<Member[]>,
+        (
+          collectionData(query(collection(this.firestore, 'members'), orderBy('displayName'))) as Observable<Member[]>
+        ).pipe(tap(() => this.loaded.set(true))),
       [],
     ),
     { initialValue: [] },

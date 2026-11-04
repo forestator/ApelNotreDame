@@ -10,19 +10,19 @@
     <nav aria-label="Navigation principale">
       <ul class="shell-nav">
         <li>
-          <a routerLink="/" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          <a routerLink="/" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
             Accueil
           </a>
         </li>
         <li>
-          <a routerLink="/projets" routerLinkActive="nav-link-active" class="nav-link">Projets</a>
+          <a routerLink="/projets" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Projets</a>
         </li>
         <li>
-          <a routerLink="/calendrier" routerLinkActive="nav-link-active" class="nav-link">Calendrier</a>
+          <a routerLink="/calendrier" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Calendrier</a>
         </li>
         @if (isAdmin()) {
           <li>
-            <a routerLink="/membres" routerLinkActive="nav-link-active" class="nav-link">Membres</a>
+            <a routerLink="/membres" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Membres</a>
           </li>
         }
       </ul>

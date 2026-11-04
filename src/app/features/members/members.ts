@@ -3,13 +3,14 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../core/auth/auth.service';
 import { MemberService } from '../../core/data/member.service';
 import { Member } from '../../core/models/member';
+import { Loader } from '../../shared/loader/loader';
 import { Avatar } from '../../shared/avatar/avatar';
 
 type PlaceholderAction = { uid: string; kind: 'replace' | 'release' };
 
 @Component({
   selector: 'app-members',
-  imports: [Avatar, ReactiveFormsModule],
+  imports: [Avatar, Loader, ReactiveFormsModule],
   templateUrl: './members.html',
   styleUrl: './members.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +20,7 @@ export class Members {
   private readonly auth = inject(AuthService);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
+  protected readonly loaded = this.memberService.loaded;
   protected readonly pending = this.memberService.pending;
   protected readonly placeholders = this.memberService.placeholders;
   protected readonly realMembers = this.memberService.realApproved;

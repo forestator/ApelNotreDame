@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   addDoc,
@@ -13,7 +13,7 @@ import {
   where,
   writeBatch,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NewTask, Task } from '../models/task';
 
@@ -24,8 +24,17 @@ export class TaskService {
   private readonly collectionRef = collection(this.firestore, 'tasks');
 
   // Les volumes d'une APEL restent faibles : on écoute tout et on filtre côté client.
+  // Faux tant que la première réponse de Firestore n'est pas arrivée : permet d'afficher un loader plutôt qu'une liste vide.
+  readonly loaded = signal(false);
+
   readonly tasks = toSignal(
-    this.auth.whenApproved(() => collectionData(this.collectionRef, { idField: 'id' }) as Observable<Task[]>, []),
+    this.auth.whenApproved(
+      () =>
+        (collectionData(this.collectionRef, { idField: 'id' }) as Observable<Task[]>).pipe(
+          tap(() => this.loaded.set(true)),
+        ),
+      [],
+    ),
     { initialValue: [] },
   );
 
