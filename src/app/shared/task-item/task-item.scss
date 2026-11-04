@@ -80,6 +80,12 @@
   border-radius: 999px;
   background: $color-primary-tint;
   font-size: 0.9rem;
+  line-height: 1.2;
+
+  // L'hôte du composant est « inline » : sans ça, sa boîte de ligne décale la photo par rapport au nom.
+  app-avatar {
+    display: inline-flex;
+  }
 }
 
 .task-person-extra {
@@ -89,6 +95,11 @@
 }
 
 .task-person-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
   min-width: 24px;
   min-height: 24px;
   border: 0;
