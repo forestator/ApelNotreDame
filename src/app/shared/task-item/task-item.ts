@@ -39,6 +39,7 @@ export class TaskItem {
   protected readonly manageOpen = signal(false);
   protected readonly commentsOpen = signal(false);
   protected readonly confirmingRemoval = signal(false);
+  protected readonly personToRemove = signal<string | null>(null);
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -110,8 +111,18 @@ export class TaskItem {
     await this.notifications.notifyRegistered(member, this.task(), this.projectName());
   }
 
-  protected removePerson(uid: string): Promise<void> {
-    return this.attempt(() => this.taskService.unregister(this.task().id, uid));
+  // Un « × » touché par mégarde ne doit pas désinscrire quelqu'un : on demande confirmation.
+  protected askPersonRemoval(uid: string): void {
+    this.personToRemove.set(uid);
+  }
+
+  protected cancelPersonRemoval(): void {
+    this.personToRemove.set(null);
+  }
+
+  protected async confirmPersonRemoval(uid: string): Promise<void> {
+    this.personToRemove.set(null);
+    await this.attempt(() => this.taskService.unregister(this.task().id, uid));
   }
 
   protected remove(): Promise<void> {
