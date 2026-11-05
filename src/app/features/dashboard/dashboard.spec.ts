@@ -24,7 +24,6 @@ describe('Dashboard', () => {
       makeTask({ id: 'd', title: 'Déjà complète', date: addDays(today, 2), needed: 1, participants: { x: 'Autre' } }),
     ]);
 
-    expect(text).toContain('Bonjour Maximilien');
     // Les compteurs ET les listes doivent s'afficher : un compteur qui plante masquerait tout ce qui suit.
     expect(text).toContain('Mes prochaines inscriptions');
     expect(text).toContain('On a besoin de vous');
@@ -39,18 +38,10 @@ describe('Dashboard', () => {
     expect(sectionOf('schedule-title')).toContain('Sans date');
   });
 
-  it('affiche les compteurs avec le nombre de projets', async () => {
-    const { element } = await render([]);
-    const tiles = Array.from(element.querySelectorAll('.stat-tile')).map((tile) => tile.textContent?.replace(/\s+/g, ' ').trim());
-    expect(tiles).toHaveLength(3);
-    expect(tiles.at(-1)).toContain('2');
-  });
-
   it('affiche un loader (et pas de liste vide) tant que les données ne sont pas arrivées', async () => {
     const { element, text } = await render([], false);
     expect(element.querySelector('[role="status"]')?.textContent).toContain('Chargement');
     expect(text).not.toContain('Vous n\'êtes inscrit·e à rien');
-    expect(element.querySelector('.stat-grid')).toBeNull();
   });
 
   it('garde la carte dans sa section après un clic, tout en mettant le compteur à jour', async () => {
@@ -65,6 +56,5 @@ describe('Dashboard', () => {
 
     expect(section('needs-title')).toContain('Besoin de monde');
     expect(section('mine-title')).not.toContain('Besoin de monde');
-    expect(element.querySelector('.stat-tile dd')?.textContent?.trim()).toBe('1');
   });
 });

@@ -12,27 +12,36 @@
       <p class="meta-line">📅 {{ day | date: 'dd/MM/yyyy' }}</p>
     }
     @if (isAdmin()) {
-      <button type="button" class="btn btn-small" (click)="startEditing()">Modifier le projet</button>
+      <button type="button" class="btn btn-small" (click)="startEditing()">
+        Modifier le projet
+      </button>
     }
   }
 
   <div class="card detail-progress" [class]="tone()">
-    <app-progress [done]="doneCount()" [total]="totalCount()" [label]="'Avancement de ' + current.name" />
+    <app-progress
+      [done]="doneCount()"
+      [total]="totalCount()"
+      [label]="'Avancement de ' + current.name"
+    />
   </div>
 
   <section aria-labelledby="tasks-title">
     <div class="section-header">
       <h2 id="tasks-title" class="section-title">Tâches</h2>
-      <button type="button" class="btn btn-primary btn-small" (click)="startAdding()">+ Nouvelle tâche</button>
+      <button type="button" class="btn btn-primary btn-small" (click)="startAdding()">
+        + Nouvelle tâche
+      </button>
     </div>
     @if (!tasksLoaded()) {
       <app-loader label="Chargement des tâches…" />
     } @else if (tasks().length) {
-      <ul class="card-list">
-        @for (task of tasks(); track task.id) {
-          <li><app-task-item [task]="task" [showProject]="false" /></li>
-        }
-      </ul>
+      <app-task-list
+        [tasks]="tasks()"
+        [showProject]="false"
+        [canAddSlot]="true"
+        (slotRequested)="startAdding($event)"
+      />
     } @else {
       <p class="empty-state">Aucune tâche pour ce projet.</p>
     }
@@ -45,17 +54,25 @@
       }
       @if (confirmingRemoval()) {
         <span role="alert">Supprimer le projet et toutes ses tâches ?</span>
-        <button type="button" class="btn btn-danger btn-small" (click)="removeProject()">Oui, supprimer</button>
+        <button type="button" class="btn btn-danger btn-small" (click)="removeProject()">
+          Oui, supprimer
+        </button>
         <button type="button" class="btn btn-small" (click)="cancelRemoval()">Annuler</button>
       } @else {
-        <button type="button" class="btn btn-danger btn-small" (click)="askRemoval()">Supprimer le projet</button>
+        <button type="button" class="btn btn-danger btn-small" (click)="askRemoval()">
+          Supprimer le projet
+        </button>
       }
     </div>
   }
 
   @if (adding()) {
     <app-modal title="Nouvelle tâche" (closed)="stopAdding()">
-      <app-task-form [fixedProjectId]="id()" (done)="stopAdding()" />
+      <app-task-form
+        [fixedProjectId]="id()"
+        [initialActivity]="addingToActivity()"
+        (done)="stopAdding()"
+      />
     </app-modal>
   }
 } @else if (project() === null) {

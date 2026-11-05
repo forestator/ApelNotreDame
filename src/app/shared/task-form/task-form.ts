@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
@@ -6,7 +15,11 @@ import { TaskService } from '../../core/data/task.service';
 import { Project } from '../../core/models/project';
 import { Task } from '../../core/models/task';
 import { toneClass } from '../../core/models/tone';
-import { frenchDateToIso, frenchDateValidator, isoToFrenchDate } from '../../core/utils/french-date';
+import {
+  frenchDateToIso,
+  frenchDateValidator,
+  isoToFrenchDate,
+} from '../../core/utils/french-date';
 import { normalizeTime, timeValidator } from '../../core/utils/french-time';
 import { uniqueId } from '../../core/utils/unique-id';
 import { DateField } from '../date-field/date-field';
@@ -31,6 +44,8 @@ export class TaskForm implements OnInit {
   readonly fixedProjectId = input<string>();
   // Date préremplie (aaaa-mm-jj), p. ex. le jour cliqué dans le calendrier.
   readonly initialDate = input<string>();
+  // Activité préremplie (bouton « + Créneau » d'une activité).
+  readonly initialActivity = input<string>();
 
   protected readonly id = uniqueId('task-form');
   protected readonly error = signal<string | null>(null);
@@ -38,6 +53,7 @@ export class TaskForm implements OnInit {
 
   protected readonly form = this.formBuilder.group({
     title: ['', [Validators.required, Validators.maxLength(120)]],
+    activity: ['', Validators.maxLength(120)],
     description: [''],
     projectId: [''],
     date: ['', frenchDateValidator],
@@ -47,14 +63,30 @@ export class TaskForm implements OnInit {
   });
 
   // Le menu des projets reprend la couleur du projet choisi.
-  private readonly projectValue = toSignal(this.form.controls.projectId.valueChanges, { initialValue: '' });
+  private readonly projectValue = toSignal(this.form.controls.projectId.valueChanges, {
+    initialValue: '',
+  });
   private readonly timeStatus = toSignal(this.form.controls.time.statusChanges, {
     initialValue: this.form.controls.time.status,
   });
   protected readonly timeInvalid = computed(() => this.timeStatus() === 'INVALID');
 
+  // Activités déjà utilisées dans le projet, proposées en suggestion pour ne pas les écrire de deux façons.
+  protected readonly activities = computed(() => {
+    const projectId = this.fixedProjectId() ?? this.task()?.projectId ?? this.projectValue();
+    const names = this.taskService
+      .tasks()
+      .filter((task) => task.projectId === projectId && task.activity?.trim())
+      .map((task) => (task.activity as string).trim());
+    return [...new Set(names)].sort((first, second) => first.localeCompare(second));
+  });
+
   protected readonly projectOptions = computed(() =>
-    this.projects().map((project) => ({ id: project.id, name: project.name, tone: toneClass(project.color) })),
+    this.projects().map((project) => ({
+      id: project.id,
+      name: project.name,
+      tone: toneClass(project.color),
+    })),
   );
   protected readonly projectTone = computed(
     () => this.projectOptions().find((option) => option.id === this.projectValue())?.tone ?? '',
@@ -64,10 +96,13 @@ export class TaskForm implements OnInit {
     const task = this.task();
     if (!task) {
       this.form.controls.date.setValue(isoToFrenchDate(this.initialDate() ?? null));
+      const activity = this.initialActivity();
+      if (activity) this.form.patchValue({ activity, title: activity });
       return;
     }
     this.form.setValue({
       title: task.title,
+      activity: task.activity ?? '',
       description: task.description,
       projectId: task.projectId,
       date: isoToFrenchDate(task.date),
@@ -91,6 +126,7 @@ export class TaskForm implements OnInit {
 
     const values = {
       title: raw.title.trim(),
+      activity: raw.activity.trim(),
       description: raw.description,
       projectId,
       date: frenchDateToIso(raw.date),
@@ -108,7 +144,9 @@ export class TaskForm implements OnInit {
       }
       this.done.emit();
     } catch {
-      this.error.set(editedTask ? "La tâche n'a pas pu être modifiée." : "La tâche n'a pas pu être ajoutée.");
+      this.error.set(
+        editedTask ? "La tâche n'a pas pu être modifiée." : "La tâche n'a pas pu être ajoutée.",
+      );
     }
   }
 }

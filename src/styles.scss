@@ -34,7 +34,10 @@
   white-space: nowrap;
 }
 
-.page {
+// Colonne de contenu centrée : les pages routées la reçoivent de <main>.
+.page,
+.shell-main > *:not(router-outlet) {
+  display: block;
   max-width: $content-width;
   margin: 0 auto;
   padding: 28px $gap 56px;

@@ -1,0 +1,47 @@
+<div class="slot" [class]="stateClass()">
+  <span class="slot-when">
+    {{ when() }}
+    @if (label()) {
+      <span class="slot-label">{{ label() }}</span>
+    }
+  </span>
+
+  <span class="slot-status">
+    @if (isPast()) {
+      <span class="badge badge-todo">Passé</span>
+    } @else if (full()) {
+      <span class="badge badge-done">{{ count() }}/{{ needed() }} ✓</span>
+    } @else if (needed() > 0) {
+      <span class="badge badge-in-progress"
+        >{{ count() }}/{{ needed() }} · manque {{ missing() }}</span
+      >
+    } @else {
+      <span class="badge badge-todo">{{ count() }} inscrit(s)</span>
+    }
+  </span>
+
+  <span class="slot-names" [class.slot-names-empty]="!names()">{{
+    names() || "Personne pour l'instant"
+  }}</span>
+
+  @if (!isPast()) {
+    <button
+      type="button"
+      class="btn btn-small slot-action"
+      [class.btn-primary]="!isRegistered()"
+      [disabled]="busy()"
+      (click)="toggleRegistration()"
+    >
+      @if (isRegistered()) {
+        Me retirer
+      } @else {
+        Je suis là
+      }
+      <span class="visually-hidden">pour {{ task().title }}, {{ when() }}</span>
+    </button>
+  }
+
+  @if (error(); as message) {
+    <p class="error-message slot-error" role="alert">{{ message }}</p>
+  }
+</div>

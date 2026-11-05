@@ -18,6 +18,9 @@ export interface Task {
   // Inscrits : uid → nom.
   participants: Record<string, string>;
   createdBy: string;
+  // Nom de l'ensemble de créneaux auquel appartient la tâche (ex. « Père Noël et mascottes »).
+  // Absent sur les anciennes tâches : elles restent affichées seules, rien n'est à migrer.
+  activity?: string;
   // Nombre de commentaires, tenu à jour à chaque ajout ou suppression.
   commentCount?: number;
 }
@@ -42,4 +45,38 @@ export function compareByWhen(first: Task, second: Task): number {
   if (byDate) return byDate;
   const byTime = (first.time ?? '99:99').localeCompare(second.time ?? '99:99');
   return byTime || first.title.localeCompare(second.title);
+}
+
+/** Nom de l'ensemble : l'activité si elle est renseignée, sinon le titre (comportement des tâches existantes). */
+export function activityName(task: Task): string {
+  return task.activity?.trim() || task.title.trim();
+}
+
+/** Les créneaux d'une même activité (même titre) : « Stand crêpes » à 10h, 12h, 14h… */
+export interface ActivityGroup {
+  title: string;
+  projectId: string;
+  tasks: Task[];
+  // Créneaux qui demandent un nombre précis de personnes, et parmi eux ceux qui sont complets.
+  targetSlots: number;
+  fullSlots: number;
+}
+
+export function groupByActivity(tasks: Task[]): ActivityGroup[] {
+  const groups = new Map<string, Task[]>();
+  for (const task of [...tasks].sort(compareByWhen)) {
+    // Deux projets peuvent avoir une activité du même nom (accueil : tous les projets mélangés).
+    const key = `${task.projectId}|${activityName(task).toLocaleLowerCase('fr')}`;
+    groups.set(key, [...(groups.get(key) ?? []), task]);
+  }
+  return Array.from(groups.values()).map((slots) => {
+    const withTarget = slots.filter((slot) => (slot.needed ?? 0) > 0);
+    return {
+      title: activityName(slots[0]),
+      projectId: slots[0].projectId,
+      tasks: slots,
+      targetSlots: withTarget.length,
+      fullSlots: withTarget.filter(isFull).length,
+    };
+  });
 }

@@ -1,0 +1,48 @@
+@use '../../../styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+// Traité comme un en-tête : pleine largeur, collé en haut sur grand écran.
+// Sur téléphone il défile avec la page, pour ne pas s'ajouter à la barre du menu qui reste fixe.
+.top-bar {
+  background: $gradient-brand;
+  border-bottom: 4px solid $color-brand-magenta;
+  box-shadow: 0 4px 16px rgba(14, 107, 102, 0.25);
+  color: #ffffff;
+
+  @media (min-width: 900px) {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+  }
+}
+
+.top-bar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  max-width: $content-width;
+  margin: 0 auto;
+  padding: 8px $gap;
+
+  // Une seule ligne dès que la largeur le permet ; sur petit téléphone les éléments passent à la ligne.
+  @media (min-width: 640px) {
+    flex-wrap: nowrap;
+  }
+}
+
+.top-bar-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.top-bar-toggle {
+  flex-shrink: 0;
+  margin-left: auto;
+}

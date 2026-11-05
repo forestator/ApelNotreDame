@@ -1,25 +1,4 @@
-<section class="hero" aria-labelledby="hero-title">
-  <p class="hero-eyebrow">Accueil</p>
-  <h1 id="hero-title" class="hero-title">Bonjour {{ member()?.displayName }} 👋</h1>
-  <p class="hero-text">Dites où vous serez : un clic sur « Je suis là » suffit.</p>
-
-  @if (!loading()) {
-    <dl class="stat-grid">
-      <div class="stat-tile">
-        <dt>Mes inscriptions à venir</dt>
-        <dd>{{ mineCount() }}</dd>
-      </div>
-      <div class="stat-tile">
-        <dt>On a besoin de vous</dt>
-        <dd>{{ needsCount() }}</dd>
-      </div>
-      <div class="stat-tile">
-        <dt>Projets</dt>
-        <dd>{{ projectCount() }}</dd>
-      </div>
-    </dl>
-  }
-</section>
+<h1 class="page-title">Accueil</h1>
 
 @if (loading()) {
   <app-loader label="Chargement de vos tâches…" />
@@ -27,24 +6,26 @@
   <section aria-labelledby="mine-title">
     <h2 id="mine-title" class="section-title">Mes prochaines inscriptions</h2>
     @if (mine().length) {
-      <ul class="card-list">
-        @for (task of mine(); track task.id) {
-          <li><app-task-item [task]="task" (registrationToggled)="pin(task, 'mine')" /></li>
-        }
-      </ul>
+      <app-task-list
+        [tasks]="mine()"
+        [showSummary]="false"
+        (registrationToggled)="pin($event, 'mine')"
+      />
     } @else {
-      <p class="empty-state">Vous n'êtes inscrit·e à rien pour l'instant. Regardez ce qu'il manque ci-dessous 👇</p>
+      <p class="empty-state">
+        Vous n'êtes inscrit·e à rien pour l'instant. Regardez ce qu'il manque ci-dessous 👇
+      </p>
     }
   </section>
 
   <section aria-labelledby="needs-title">
     <h2 id="needs-title" class="section-title">On a besoin de vous</h2>
     @if (needsPeople().length) {
-      <ul class="card-list">
-        @for (task of needsPeople(); track task.id) {
-          <li><app-task-item [task]="task" (registrationToggled)="pin(task, 'needs')" /></li>
-        }
-      </ul>
+      <app-task-list
+        [tasks]="needsPeople()"
+        [showSummary]="false"
+        (registrationToggled)="pin($event, 'needs')"
+      />
     } @else {
       <p class="empty-state">Tout est complet. Merci ! 🎉</p>
     }
@@ -54,11 +35,7 @@
     <section aria-labelledby="schedule-title">
       <h2 id="schedule-title" class="section-title">À planifier</h2>
       <p class="meta-line">Ces tâches n'ont pas encore de date.</p>
-      <ul class="card-list">
-        @for (task of toSchedule(); track task.id) {
-          <li><app-task-item [task]="task" /></li>
-        }
-      </ul>
+      <app-task-list [tasks]="toSchedule()" [showSummary]="false" />
     </section>
   }
 }

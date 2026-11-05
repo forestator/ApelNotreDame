@@ -15,6 +15,27 @@
     />
   </div>
 
+  <div class="field">
+    <label class="field-label" [attr.for]="id + '-activity'">Activité (facultatif)</label>
+    <input
+      [id]="id + '-activity'"
+      class="field-control"
+      type="text"
+      formControlName="activity"
+      placeholder="Ex. Père Noël et mascottes"
+      [attr.list]="id + '-activities'"
+      [attr.aria-describedby]="id + '-activity-hint'"
+    />
+    <datalist [id]="id + '-activities'">
+      @for (name of activities(); track name) {
+        <option [value]="name"></option>
+      }
+    </datalist>
+    <span [id]="id + '-activity-hint'" class="field-hint">
+      Les tâches qui ont la même activité sont regroupées en créneaux dans la vue condensée.
+    </span>
+  </div>
+
   @if (showProject()) {
     <div class="field">
       <label class="field-label" [attr.for]="id + '-project'">Projet</label>
@@ -27,7 +48,9 @@
       >
         <option value="">Choisir…</option>
         @for (option of projectOptions(); track option.id) {
-          <option [value]="option.id" class="select-option" [class]="option.tone">{{ option.name }}</option>
+          <option [value]="option.id" class="select-option" [class]="option.tone">
+            {{ option.name }}
+          </option>
         }
       </select>
     </div>
@@ -56,26 +79,47 @@
   <div class="form-row">
     <div class="field">
       <label class="field-label" [attr.for]="id + '-needed'">Combien de personnes ?</label>
-      <input [id]="id + '-needed'" class="field-control" type="number" min="0" max="200" formControlName="needed" />
+      <input
+        [id]="id + '-needed'"
+        class="field-control"
+        type="number"
+        min="0"
+        max="200"
+        formControlName="needed"
+      />
       <span class="field-hint">0 si on ne fixe pas de nombre.</span>
     </div>
     <div class="field">
       <label class="field-label" [attr.for]="id + '-extra'">Déjà prévus hors application</label>
-      <input [id]="id + '-extra'" class="field-control" type="number" min="0" max="200" formControlName="extraPeople" />
+      <input
+        [id]="id + '-extra'"
+        class="field-control"
+        type="number"
+        min="0"
+        max="200"
+        formControlName="extraPeople"
+      />
       <span class="field-hint">Comptés dans l'effectif.</span>
     </div>
   </div>
 
   <div class="field">
     <label class="field-label" [attr.for]="id + '-description'">Détails (facultatif)</label>
-    <textarea [id]="id + '-description'" class="field-control" rows="2" formControlName="description"></textarea>
+    <textarea
+      [id]="id + '-description'"
+      class="field-control"
+      rows="2"
+      formControlName="description"
+    ></textarea>
   </div>
 
   @if (error(); as message) {
     <p class="error-message" role="alert">{{ message }}</p>
   }
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ task() ? 'Enregistrer' : 'Ajouter la tâche' }}</button>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      {{ task() ? 'Enregistrer' : 'Ajouter la tâche' }}
+    </button>
     <button type="button" class="btn" (click)="done.emit()">Annuler</button>
   </div>
 </form>

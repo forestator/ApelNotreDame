@@ -1,0 +1,20 @@
+<div class="view-toggle" [class.view-toggle-inline]="inline()" role="group" aria-label="Affichage des tâches">
+  <button
+    type="button"
+    class="btn btn-small"
+    [class.btn-primary]="viewMode.condensed()"
+    [attr.aria-pressed]="viewMode.condensed()"
+    (click)="viewMode.set(true)"
+  >
+    Vue condensée
+  </button>
+  <button
+    type="button"
+    class="btn btn-small"
+    [class.btn-primary]="!viewMode.condensed()"
+    [attr.aria-pressed]="!viewMode.condensed()"
+    (click)="viewMode.set(false)"
+  >
+    Vue détaillée
+  </button>
+</div>

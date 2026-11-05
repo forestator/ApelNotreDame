@@ -1,46 +1,141 @@
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 
-<header class="shell-header">
-  <div class="shell-bar">
-    <a routerLink="/" class="shell-brand">
-      <img ngSrc="logo.jpeg" width="44" height="44" alt="" class="shell-logo" priority />
-      <span>APEL Notre-Dame</span>
-    </a>
-
-    <nav aria-label="Navigation principale">
-      <ul class="shell-nav">
-        <li>
-          <a routerLink="/" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            Accueil
-          </a>
-        </li>
-        <li>
-          <a routerLink="/projets" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Projets</a>
-        </li>
-        <li>
-          <a routerLink="/calendrier" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Calendrier</a>
-        </li>
-        @if (isAdmin()) {
-          <li>
-            <a routerLink="/membres" routerLinkActive="nav-link-active" ariaCurrentWhenActive="page" class="nav-link">Membres</a>
-          </li>
-        }
-      </ul>
-    </nav>
-
-    <div class="shell-user">
-      @if (member(); as current) {
-        <a routerLink="/profil" class="shell-user-link">
-          <app-avatar [name]="current.displayName" [photoUrl]="current.photoURL" [light]="true" />
-          <span class="shell-user-name">{{ current.displayName }}</span>
-          <span class="visually-hidden">(mon profil)</span>
-        </a>
-      }
-      <button type="button" class="btn btn-small shell-logout" (click)="signOut()">Déconnexion</button>
-    </div>
-  </div>
+<header class="shell-top">
+  <button
+    #toggleButton
+    type="button"
+    class="shell-toggle"
+    aria-controls="menu-principal"
+    [attr.aria-expanded]="menuOpen()"
+    (click)="toggleMenu()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+    <span class="visually-hidden">Menu</span>
+  </button>
+  <a routerLink="/" class="shell-brand-small">
+    <img ngSrc="logo.jpeg" width="36" height="36" alt="" class="shell-logo" />
+    <span>APEL Notre-Dame</span>
+  </a>
 </header>
 
-<main id="contenu" class="page" tabindex="-1">
-  <router-outlet />
-</main>
+@if (menuOpen()) {
+  <div class="shell-overlay" aria-hidden="true" (click)="closeMenu(true)"></div>
+}
+
+<aside
+  #side
+  id="menu-principal"
+  class="shell-side"
+  [class.shell-side-open]="menuOpen()"
+  (click)="closeOnLink($event)"
+>
+  <a routerLink="/" class="shell-brand">
+    <img ngSrc="logo.jpeg" width="44" height="44" alt="" class="shell-logo" priority />
+    <span>APEL Notre-Dame</span>
+  </a>
+
+  <nav aria-label="Navigation principale" class="shell-nav-wrap">
+    <ul class="shell-nav">
+      <li>
+        <a
+          routerLink="/"
+          routerLinkActive="nav-link-active"
+          ariaCurrentWhenActive="page"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+        >
+          <span aria-hidden="true">🏠</span> Accueil
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/projets"
+          routerLinkActive="nav-link-active"
+          ariaCurrentWhenActive="page"
+          class="nav-link"
+        >
+          <span aria-hidden="true">📁</span> Projets
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/calendrier"
+          routerLinkActive="nav-link-active"
+          ariaCurrentWhenActive="page"
+          class="nav-link"
+        >
+          <span aria-hidden="true">📅</span> Calendrier
+        </a>
+      </li>
+      @if (isAdmin()) {
+        <li>
+          <a
+            routerLink="/membres"
+            routerLinkActive="nav-link-active"
+            ariaCurrentWhenActive="page"
+            class="nav-link"
+          >
+            <span aria-hidden="true">👥</span> Membres
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="shell-user">
+    @if (member(); as current) {
+      <a routerLink="/profil" class="shell-user-link">
+        <app-avatar [name]="current.displayName" [photoUrl]="current.photoURL" [light]="true" />
+        <span class="shell-user-name">{{ current.displayName }}</span>
+        <span class="visually-hidden">(mon profil)</span>
+      </a>
+    }
+    <a
+      class="shell-social"
+      href="https://www.instagram.com/apelnotredamemontfortsurmeu/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <svg
+        class="shell-social-icon"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+      </svg>
+      Instagram<span class="visually-hidden"> (nouvel onglet)</span>
+    </a>
+    <button type="button" class="btn btn-small shell-logout" (click)="signOut()">
+      Déconnexion
+    </button>
+  </div>
+</aside>
+
+<div class="shell-content">
+  <app-top-bar />
+  <main id="contenu" class="shell-main" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>

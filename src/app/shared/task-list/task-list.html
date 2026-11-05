@@ -1,0 +1,65 @@
+@if (condensed()) {
+  <ul class="card-list">
+    @for (group of groups(); track group.projectId + group.title) {
+      <li>
+        <section class="card activity" [attr.aria-label]="group.title">
+          <div class="activity-head">
+            <h3 class="activity-title">{{ group.title }}</h3>
+            @if (showSummary() && group.targetSlots) {
+              <span
+                class="badge"
+                [class.badge-done]="group.fullSlots === group.targetSlots"
+                [class.badge-in-progress]="group.fullSlots < group.targetSlots"
+              >
+                {{ group.fullSlots }}/{{ group.targetSlots }} créneaux complets
+              </span>
+            }
+          </div>
+          @if (showProject() && group.projectName) {
+            <p class="activity-chips">
+              <a
+                class="chip chip-project"
+                [class]="group.projectTone"
+                [routerLink]="['/projets', group.projectId]"
+              >
+                Projet · {{ group.projectName }}
+              </a>
+            </p>
+          }
+          <ul class="slot-list">
+            @for (task of group.tasks; track task.id) {
+              <li>
+                <app-task-slot
+                  [task]="task"
+                  [activity]="group.title"
+                  (registrationToggled)="registrationToggled.emit(task)"
+                />
+              </li>
+            }
+          </ul>
+          @if (canAddSlot()) {
+            <button
+              type="button"
+              class="btn btn-small activity-add"
+              (click)="slotRequested.emit(group.title)"
+            >
+              + Créneau<span class="visually-hidden"> pour {{ group.title }}</span>
+            </button>
+          }
+        </section>
+      </li>
+    }
+  </ul>
+} @else {
+  <ul class="card-list">
+    @for (task of tasks(); track task.id) {
+      <li>
+        <app-task-item
+          [task]="task"
+          [showProject]="showProject()"
+          (registrationToggled)="registrationToggled.emit(task)"
+        />
+      </li>
+    }
+  </ul>
+}

@@ -13,11 +13,20 @@ import { Modal } from '../../shared/modal/modal';
 import { Progress } from '../../shared/progress/progress';
 import { ProjectForm } from '../../shared/project-form/project-form';
 import { TaskForm } from '../../shared/task-form/task-form';
-import { TaskItem } from '../../shared/task-item/task-item';
+import { TaskList } from '../../shared/task-list/task-list';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [DatePipe, Loader, Modal, Progress, ProjectForm, RouterLink, TaskForm, TaskItem],
+  imports: [
+    DatePipe,
+    Loader,
+    Modal,
+    Progress,
+    ProjectForm,
+    RouterLink,
+    TaskForm,
+    TaskList,
+  ],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +45,7 @@ export class ProjectDetail {
   protected readonly confirmingRemoval = signal(false);
   protected readonly editing = signal(false);
   protected readonly adding = signal(false);
+  protected readonly addingToActivity = signal<string | undefined>(undefined);
 
   protected readonly project = toSignal(
     toObservable(this.id).pipe(
@@ -45,17 +55,22 @@ export class ProjectDetail {
     ),
   );
   // undefined tant que la première réponse n'est pas arrivée (on affiche alors un loader).
-  private readonly projectTasks = toSignal(toObservable(this.id).pipe(switchMap((id) => this.taskService.forProject$(id))));
+  private readonly projectTasks = toSignal(
+    toObservable(this.id).pipe(switchMap((id) => this.taskService.forProject$(id))),
+  );
   protected readonly tasksLoaded = computed(() => this.projectTasks() !== undefined);
 
   protected readonly tone = computed(() => toneClass(this.project()?.color));
   protected readonly tasks = computed(() => [...(this.projectTasks() ?? [])].sort(compareByWhen));
 
-  private readonly withTarget = computed(() => (this.projectTasks() ?? []).filter((task) => (task.needed ?? 0) > 0));
+  private readonly withTarget = computed(() =>
+    (this.projectTasks() ?? []).filter((task) => (task.needed ?? 0) > 0),
+  );
   protected readonly doneCount = computed(() => this.withTarget().filter(isFull).length);
   protected readonly totalCount = computed(() => this.withTarget().length);
 
-  protected startAdding(): void {
+  protected startAdding(activity?: string): void {
+    this.addingToActivity.set(activity);
     this.adding.set(true);
   }
 
